@@ -1,0 +1,21 @@
+{
+ "name": "Medical Coding Cost",
+ "short_name": "Medical Coding Cost",
+ "description": "Medical coding certification cost in 2026: CPC, COC, CPB, CCA, CCS exam fees, membership, retakes and renewal, from AAPC and AHIMA fee pages.",
+ "start_url": "/en/",
+ "display": "standalone",
+ "background_color": "#ffffff",
+ "theme_color": "#2F5D7C",
+ "icons": [
+  {
+   "src": "/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  }
+ ]
+}

@@ -1,0 +1,23 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import LegalIdentity from '../../components/LegalIdentity.astro';
+import { CONTACT_EMAIL, LAST_UPDATED, SITE_NAMES } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+import { displayDate } from '../../lib/format';
+const lang = 'en';
+---
+<PageLayout title={`Contact ${SITE_NAMES[lang]}: a fee, a rule, an embed`} description="Write to Medical Coding Cost when an exam, membership or renewal fee looks out of date, when a rule seems wrong, or to embed the free credential cost comparator on your site." lang={lang} noindex={true} breadcrumbs={[{ label: 'Contact' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Contact</h1>
+    <p>Email: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Every message is read by a person.</p>
+    <h2>A fee or a rule has changed</h2>
+    <p>Tell us which one and, if you can, the AAPC or AHIMA page that shows the new figure. We read the page again, update the parameter file and date the change.</p>
+    <h2>What we cannot do</h2>
+    <p>We are not AAPC or AHIMA. We cannot sell or refund a voucher, change an appointment, see an application or say whether you are eligible. Please never send a member number, an exam result or anything about a patient.</p>
+    <h2>Using the comparator on your site</h2>
+    <p>Schools, workforce programs and employers can show the comparator in an iframe for free: see the <a href={route('widget', lang)}>embed page</a>.</p>
+    <h2>Publisher</h2>
+    <LegalIdentity lang={lang} />
+    <p>Updated on <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, 'en-US')}</time>.</p>
+  </div>
+</PageLayout>

@@ -1,0 +1,18 @@
+---
+/** Renders one calculator of `lib/mini-specs.ts` with its page defaults (numeric props) and the fields the page fixes (`locked`). */
+import MiniSim from './calc/MiniSim';
+import { route, hasRoute, type Locale } from '../i18n/routes';
+import { CTA_PAGE } from '../lib/mini-specs';
+import type { ToolDef } from '../lib/guide-types';
+interface Props { tool: ToolDef; lang?: Locale; primary?: boolean; idPrefix?: string; seedKey?: string; title?: string }
+const { tool, lang = 'en', primary = false, idPrefix, title } = Astro.props;
+const props = (tool.props ?? {}) as Record<string, any>;
+const mini = tool.kind.startsWith('mini:') ? tool.kind.slice(5) : null;
+if (!mini) throw new Error(`Unknown tool kind: ${tool.kind}`);
+const link = (id?: string) => (id && hasRoute(id, lang) ? route(id, lang) : undefined);
+const numDefaults: Record<string, number> = {};
+for (const [k, v] of Object.entries(props)) if (typeof v === 'number') numDefaults[k] = v;
+const locked = typeof props.locked === 'string' ? String(props.locked).split(',') : [];
+const pre = idPrefix ?? (primary ? 'p' : 'm');
+---
+<MiniSim client:load kind={mini} href={link(CTA_PAGE[mini])} defaults={numDefaults} idPrefix={pre} title={title} locked={locked} />

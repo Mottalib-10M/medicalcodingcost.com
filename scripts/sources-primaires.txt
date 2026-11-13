@@ -1,0 +1,6 @@
+# AAPC : association qui délivre les certifications CPC, COC, CIC, CRC et CPB ; publie le prix des bons d'examen, la cotisation, le format des examens et les règles de CEU
+aapc.com
+# AHIMA : association qui délivre les certifications CCA, CCS, CCS-P et RHIT ; publie les frais d'examen, les taux de réussite et le guide de recertification (lien vers l'accueil seulement, conditions d'AHIMA)
+ahima.org
+# Pearson VUE : prestataire qui fait passer les examens d'AHIMA
+pearsonvue.com

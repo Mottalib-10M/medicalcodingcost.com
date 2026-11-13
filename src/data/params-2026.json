@@ -1,0 +1,839 @@
+{
+ "_lisezmoi": "Every fee, format, rule and pass rate shown by the site lives here, read by hand on 2026-11-13 on the page named in `sources` (AAPC pages: fees inside the page's FAQ data; AHIMA pages: certification pages, Recertification Guide PDF, membership types). AHIMA's terms require written approval for links to inner pages: AHIMA is cited by page name and linked at its home page only. NHA (CBCS) refused automated reading (HTTP 403): not costed. No salary figure (portfolio rule of 2026-11-01). Manual update: no schedule is promised.",
+ "year": 2026,
+ "retrieved_at": "2026-11-13",
+ "valid_from": "2026-01-01",
+ "valid_to": "2026-12-31",
+ "sources": {
+  "aapc_exams": {
+   "url": "https://www.aapc.com/certifications/exams",
+   "label": {
+    "en": "AAPC, Certification exams: voucher prices (1 or 2 attempts), one-year validity, exam length, end-of-year blackout"
+   }
+  },
+  "aapc_cpc": {
+   "url": "https://www.aapc.com/certifications/cpc",
+   "label": {
+    "en": "AAPC, Certified Professional Coder (CPC) certification: renewal rule, apprentice status, exam cost FAQ"
+   }
+  },
+  "aapc_taking": {
+   "url": "https://www.aapc.com/certifications/cpc/taking-the-cpc-exam",
+   "label": {
+    "en": "AAPC, Taking the CPC exam: 100 questions, four hours, 70% to pass, questions per area, approved code books"
+   }
+  },
+  "aapc_after": {
+   "url": "https://www.aapc.com/certifications/cpc/after-getting-your-cpc-certification",
+   "label": {
+    "en": "AAPC, After getting your CPC certification: CEUs, apprentice status removal"
+   }
+  },
+  "aapc_members": {
+   "url": "https://www.aapc.com/memberships/",
+   "label": {
+    "en": "AAPC, Membership options: individual and student dues, member price of the code book bundle, 80-hour course waiver"
+   }
+  },
+  "aapc_reschedule": {
+   "url": "https://www.aapc.com/certifications/exams/reschedule-or-cancel-an-exam",
+   "label": {
+    "en": "AAPC, Reschedule or cancel an exam: remote and testing-center rules and fees"
+   }
+  },
+  "aapc_cpb": {
+   "url": "https://www.aapc.com/certifications/cpb",
+   "label": {
+    "en": "AAPC, Certified Professional Biller (CPB) certification"
+   }
+  },
+  "aapc_coc": {
+   "url": "https://www.aapc.com/certifications/coc",
+   "label": {
+    "en": "AAPC, Certified Outpatient Coder (COC) certification"
+   }
+  },
+  "aapc_cic": {
+   "url": "https://www.aapc.com/certifications/cic",
+   "label": {
+    "en": "AAPC, Certified Inpatient Coder (CIC) certification"
+   }
+  },
+  "aapc_crc": {
+   "url": "https://www.aapc.com/certifications/crc",
+   "label": {
+    "en": "AAPC, Certified Risk Adjustment Coder (CRC) certification"
+   }
+  },
+  "ahima": {
+   "url": "https://www.ahima.org/",
+   "label": {
+    "en": "AHIMA (home page): fees, formats and pass rates read on its CCA, CCS, CCS-P and RHIT certification pages, its Recertification Guide and its membership types page; AHIMA asks written approval for links to inner pages, so we link the home page"
+   }
+  },
+  "pearson_ahima": {
+   "url": "https://home.pearsonvue.com/ahima",
+   "label": {
+    "en": "Pearson VUE, AHIMA exams: scheduling and test centers"
+   }
+  },
+  "ipeds": {
+   "url": "https://nces.ed.gov/ipeds/use-the-data",
+   "label": {
+    "en": "NCES, IPEDS Completions 2023-24 (file C2024_A, provisional release, September 2025), public domain"
+   }
+  },
+  "cip": {
+   "url": "https://nces.ed.gov/ipeds/cipcode/default.aspx?y=56",
+   "label": {
+    "en": "NCES, Classification of Instructional Programs 2020: code 51.0713, Medical Insurance Coding Specialist/Coder"
+   }
+  }
+ },
+ "aapc": {
+  "voucher": {
+   "core": {
+    "one": 425,
+    "two": 499
+   },
+   "student": {
+    "one": 400,
+    "two": 475
+   },
+   "specialty": {
+    "one": 325,
+    "two": 399
+   }
+  },
+  "coreExams": [
+   "CPC",
+   "CIC",
+   "CRC",
+   "COC",
+   "CPMA",
+   "CPCO",
+   "CPPM",
+   "CDEO",
+   "CDEI",
+   "CPB"
+  ],
+  "voucherValidMonths": 12,
+  "registerWeeksBefore": 3,
+  "resultsBusinessDays": [
+   7,
+   10
+  ],
+  "blackout": {
+   "startMonth": 12,
+   "startDay": 30,
+   "resumes": "the second Monday of January"
+  },
+  "membership": {
+   "individual": 229,
+   "student": 164,
+   "renewal": 229,
+   "plan2": [
+    114.5,
+    114.5
+   ]
+  },
+  "ceu": {
+   "perCycle": 36,
+   "cycleYears": 2
+  },
+  "prepMonths": [
+   4,
+   8
+  ],
+  "apprentice": {
+   "years": 2,
+   "courseHours": 80,
+   "waivesYears": 1
+  },
+  "books": {
+   "proFeeBundle": {
+    "member": 244.99,
+    "nonMember": 374.93
+   }
+  },
+  "reschedule": {
+   "remoteFreeHours": 48,
+   "centerFreeDays": 10,
+   "centerFee": 25,
+   "centerFeeFromDays": 9,
+   "centerFeeToDays": 2
+  },
+  "cpc": {
+   "questions": 100,
+   "minutes": 240,
+   "passShare": 0.7,
+   "passCorrect": 70,
+   "areas": [
+    [
+     "Medical terminology",
+     4
+    ],
+    [
+     "Anatomy",
+     4
+    ],
+    [
+     "Compliance and regulatory",
+     3
+    ],
+    [
+     "Coding guidelines",
+     7
+    ],
+    [
+     "ICD-10-CM diagnosis coding",
+     5
+    ],
+    [
+     "HCPCS Level II",
+     3
+    ],
+    [
+     "CPT 10000 series",
+     6
+    ],
+    [
+     "CPT 20000 series",
+     6
+    ],
+    [
+     "CPT 30000 series",
+     6
+    ],
+    [
+     "CPT 40000 series",
+     6
+    ],
+    [
+     "CPT 50000 series",
+     6
+    ],
+    [
+     "CPT 60000 series",
+     6
+    ],
+    [
+     "Radiology",
+     6
+    ],
+    [
+     "Pathology and laboratory",
+     6
+    ],
+    [
+     "Medicine",
+     6
+    ],
+    [
+     "Evaluation and management (E/M)",
+     6
+    ],
+    [
+     "Anesthesia",
+     4
+    ],
+    [
+     "Cases (10 cases, 1 question each)",
+     10
+    ]
+   ]
+  }
+ },
+ "ahima": {
+  "passScore": 300,
+  "retakeWaitDays": 30,
+  "scheduleWithinDays": 120,
+  "exams": {
+   "cca": {
+    "member": 199,
+    "nonMember": 299,
+    "items": 105,
+    "scored": 90,
+    "minutes": 120,
+    "certified": 7753,
+    "rates": [
+     [
+      2023,
+      2445,
+      0.7
+     ],
+     [
+      2024,
+      2490,
+      0.67
+     ],
+     [
+      2025,
+      2101,
+      0.62
+     ]
+    ]
+   },
+   "ccs": {
+    "member": 299,
+    "nonMember": 399,
+    "items": 107,
+    "scored": 97,
+    "minutes": 240,
+    "certified": 36925,
+    "rates": [
+     [
+      2023,
+      3287,
+      0.64
+     ],
+     [
+      2024,
+      4031,
+      0.75
+     ],
+     [
+      2025,
+      6331,
+      0.84
+     ]
+    ]
+   },
+   "ccsp": {
+    "member": 299,
+    "nonMember": 399,
+    "items": 121,
+    "scored": 97,
+    "minutes": 240,
+    "certified": 3927,
+    "rates": [
+     [
+      2023,
+      314,
+      0.38
+     ],
+     [
+      2024,
+      394,
+      0.48
+     ],
+     [
+      2025,
+      357,
+      0.5
+     ]
+    ]
+   },
+   "rhit": {
+    "member": 229,
+    "nonMember": 299,
+    "items": 150,
+    "scored": 130,
+    "minutes": 210,
+    "certified": 26128,
+    "rates": [
+     [
+      2023,
+      1577,
+      0.84
+     ],
+     [
+      2024,
+      1541,
+      0.78
+     ],
+     [
+      2025,
+      1630,
+      0.74
+     ]
+    ]
+   }
+  },
+  "pearson": {
+   "freeBusinessDays": 15,
+   "feeFromDays": 14,
+   "feeToHours": 24,
+   "fee": 30,
+   "refundProcessing": 75,
+   "refundBusinessDays": 14,
+   "lateMinutes": 30
+  },
+  "membership": {
+   "professional": 149,
+   "premier": 209,
+   "student": 49,
+   "stateDues": 50
+  },
+  "recert": {
+   "ceus": {
+    "cca": 20,
+    "ccs": 20,
+    "ccsp": 20
+   },
+   "cycleYears": 2,
+   "nonMember": 218,
+   "nonMemberExtra": 50,
+   "member": 100,
+   "memberExtra": 20,
+   "extension": 50,
+   "reinstatement": 368,
+   "ceuPerAdditionalCert": 6
+  }
+ },
+ "ipeds": {
+  "year": "2023-24",
+  "cip": "51.0713",
+  "title": "Medical Insurance Coding Specialist/Coder",
+  "release": "provisional, September 2025",
+  "total": 10170,
+  "institutions": 367,
+  "tot": {
+   "short": 2563,
+   "cert": 6063,
+   "assoc": 1539,
+   "other": 5,
+   "inst": 367
+  },
+  "absent": [
+   "District of Columbia",
+   "Delaware",
+   "Rhode Island",
+   "Vermont"
+  ],
+  "rows": [
+   {
+    "st": "AK",
+    "name": "Alaska",
+    "inst": 4,
+    "short": 44,
+    "cert": 12,
+    "assoc": 36,
+    "other": 0
+   },
+   {
+    "st": "AL",
+    "name": "Alabama",
+    "inst": 3,
+    "short": 22,
+    "cert": 11,
+    "assoc": 50,
+    "other": 0
+   },
+   {
+    "st": "AR",
+    "name": "Arkansas",
+    "inst": 7,
+    "short": 66,
+    "cert": 19,
+    "assoc": 22,
+    "other": 0
+   },
+   {
+    "st": "AZ",
+    "name": "Arizona",
+    "inst": 14,
+    "short": 71,
+    "cert": 390,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "CA",
+    "name": "California",
+    "inst": 29,
+    "short": 147,
+    "cert": 826,
+    "assoc": 52,
+    "other": 0
+   },
+   {
+    "st": "CO",
+    "name": "Colorado",
+    "inst": 2,
+    "short": 0,
+    "cert": 69,
+    "assoc": 43,
+    "other": 0
+   },
+   {
+    "st": "CT",
+    "name": "Connecticut",
+    "inst": 4,
+    "short": 22,
+    "cert": 27,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "FL",
+    "name": "Florida",
+    "inst": 9,
+    "short": 61,
+    "cert": 157,
+    "assoc": 457,
+    "other": 0
+   },
+   {
+    "st": "GA",
+    "name": "Georgia",
+    "inst": 16,
+    "short": 170,
+    "cert": 96,
+    "assoc": 19,
+    "other": 0
+   },
+   {
+    "st": "HI",
+    "name": "Hawaii",
+    "inst": 1,
+    "short": 0,
+    "cert": 48,
+    "assoc": 17,
+    "other": 0
+   },
+   {
+    "st": "IA",
+    "name": "Iowa",
+    "inst": 3,
+    "short": 7,
+    "cert": 38,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "ID",
+    "name": "Idaho",
+    "inst": 1,
+    "short": 0,
+    "cert": 11,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "IL",
+    "name": "Illinois",
+    "inst": 23,
+    "short": 69,
+    "cert": 178,
+    "assoc": 12,
+    "other": 0
+   },
+   {
+    "st": "IN",
+    "name": "Indiana",
+    "inst": 3,
+    "short": 111,
+    "cert": 0,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "KS",
+    "name": "Kansas",
+    "inst": 8,
+    "short": 0,
+    "cert": 123,
+    "assoc": 18,
+    "other": 0
+   },
+   {
+    "st": "KY",
+    "name": "Kentucky",
+    "inst": 4,
+    "short": 17,
+    "cert": 61,
+    "assoc": 6,
+    "other": 0
+   },
+   {
+    "st": "LA",
+    "name": "Louisiana",
+    "inst": 9,
+    "short": 72,
+    "cert": 279,
+    "assoc": 14,
+    "other": 0
+   },
+   {
+    "st": "MA",
+    "name": "Massachusetts",
+    "inst": 5,
+    "short": 24,
+    "cert": 6,
+    "assoc": 16,
+    "other": 0
+   },
+   {
+    "st": "MD",
+    "name": "Maryland",
+    "inst": 1,
+    "short": 0,
+    "cert": 14,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "ME",
+    "name": "Maine",
+    "inst": 4,
+    "short": 20,
+    "cert": 24,
+    "assoc": 30,
+    "other": 0
+   },
+   {
+    "st": "MI",
+    "name": "Michigan",
+    "inst": 10,
+    "short": 85,
+    "cert": 32,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "MN",
+    "name": "Minnesota",
+    "inst": 13,
+    "short": 451,
+    "cert": 91,
+    "assoc": 12,
+    "other": 0
+   },
+   {
+    "st": "MO",
+    "name": "Missouri",
+    "inst": 5,
+    "short": 17,
+    "cert": 55,
+    "assoc": 15,
+    "other": 0
+   },
+   {
+    "st": "MS",
+    "name": "Mississippi",
+    "inst": 4,
+    "short": 0,
+    "cert": 44,
+    "assoc": 37,
+    "other": 0
+   },
+   {
+    "st": "MT",
+    "name": "Montana",
+    "inst": 2,
+    "short": 0,
+    "cert": 18,
+    "assoc": 3,
+    "other": 0
+   },
+   {
+    "st": "NC",
+    "name": "North Carolina",
+    "inst": 4,
+    "short": 0,
+    "cert": 44,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "ND",
+    "name": "North Dakota",
+    "inst": 1,
+    "short": 0,
+    "cert": 2,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "NE",
+    "name": "Nebraska",
+    "inst": 2,
+    "short": 0,
+    "cert": 7,
+    "assoc": 4,
+    "other": 0
+   },
+   {
+    "st": "NH",
+    "name": "New Hampshire",
+    "inst": 3,
+    "short": 0,
+    "cert": 23,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "NJ",
+    "name": "New Jersey",
+    "inst": 4,
+    "short": 30,
+    "cert": 19,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "NM",
+    "name": "New Mexico",
+    "inst": 2,
+    "short": 13,
+    "cert": 0,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "NV",
+    "name": "Nevada",
+    "inst": 4,
+    "short": 3,
+    "cert": 71,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "NY",
+    "name": "New York",
+    "inst": 10,
+    "short": 23,
+    "cert": 663,
+    "assoc": 235,
+    "other": 0
+   },
+   {
+    "st": "OH",
+    "name": "Ohio",
+    "inst": 25,
+    "short": 259,
+    "cert": 287,
+    "assoc": 158,
+    "other": 3
+   },
+   {
+    "st": "OK",
+    "name": "Oklahoma",
+    "inst": 10,
+    "short": 0,
+    "cert": 158,
+    "assoc": 17,
+    "other": 0
+   },
+   {
+    "st": "OR",
+    "name": "Oregon",
+    "inst": 6,
+    "short": 22,
+    "cert": 29,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "PA",
+    "name": "Pennsylvania",
+    "inst": 19,
+    "short": 157,
+    "cert": 286,
+    "assoc": 54,
+    "other": 2
+   },
+   {
+    "st": "PR",
+    "name": "Puerto Rico",
+    "inst": 1,
+    "short": 0,
+    "cert": 4,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "SC",
+    "name": "South Carolina",
+    "inst": 3,
+    "short": 0,
+    "cert": 43,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "SD",
+    "name": "South Dakota",
+    "inst": 4,
+    "short": 2,
+    "cert": 15,
+    "assoc": 13,
+    "other": 0
+   },
+   {
+    "st": "TN",
+    "name": "Tennessee",
+    "inst": 7,
+    "short": 68,
+    "cert": 346,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "TX",
+    "name": "Texas",
+    "inst": 35,
+    "short": 64,
+    "cert": 1027,
+    "assoc": 43,
+    "other": 0
+   },
+   {
+    "st": "UT",
+    "name": "Utah",
+    "inst": 6,
+    "short": 280,
+    "cert": 38,
+    "assoc": 0,
+    "other": 0
+   },
+   {
+    "st": "VA",
+    "name": "Virginia",
+    "inst": 2,
+    "short": 33,
+    "cert": 10,
+    "assoc": 6,
+    "other": 0
+   },
+   {
+    "st": "WA",
+    "name": "Washington",
+    "inst": 12,
+    "short": 61,
+    "cert": 77,
+    "assoc": 72,
+    "other": 0
+   },
+   {
+    "st": "WI",
+    "name": "Wisconsin",
+    "inst": 16,
+    "short": 72,
+    "cert": 224,
+    "assoc": 37,
+    "other": 0
+   },
+   {
+    "st": "WV",
+    "name": "West Virginia",
+    "inst": 6,
+    "short": 0,
+    "cert": 51,
+    "assoc": 41,
+    "other": 0
+   },
+   {
+    "st": "WY",
+    "name": "Wyoming",
+    "inst": 1,
+    "short": 0,
+    "cert": 10,
+    "assoc": 0,
+    "other": 0
+   }
+  ]
+ }
+}

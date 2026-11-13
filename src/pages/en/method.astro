@@ -1,0 +1,31 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { LAST_UPDATED } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+import { breadcrumbSchema, articleSchema } from '../../lib/seo';
+import { helpers } from '../../lib/helpers';
+import { displayDate } from '../../lib/format';
+const lang = 'en';
+const h = helpers(lang);
+const { A, H, I, E } = h;
+const ex = E.voucherChoice(0.7);
+---
+<PageLayout title="Method: how Medical Coding Cost adds up a coding credential" description="How we read AAPC and AHIMA fees, count retakes from published pass rates, add dues and renewal fees over the years, and count coding programs in the IPEDS file." lang={lang} jsonLd={[articleSchema({ title: 'How the costs are added up', description: 'Method of Medical Coding Cost', path: route('method', lang), lang }), breadcrumbSchema([{ name: 'Home', path: route('home', lang) }, { name: 'Method', path: route('method', lang) }])]} breadcrumbs={[{ label: 'Method' }]}>
+  <header class="mb-6"><p class="mb-1 text-xs font-semibold uppercase tracking-wide text-accent-600">Method</p><h1 class="mt-0 text-3xl font-bold text-navy-900 md:text-4xl">How the costs are added up</h1></header>
+  <div class="prose prose-slate max-w-none">
+    <p>Every page and calculator reads one parameter file, written by hand on {h.read} from the pages named below. No page types a fee itself, so a change on an AAPC or AHIMA page is made once and every page follows. Nothing updates on its own: the date shown is the day of the last reading.</p>
+    <h2>1. Exam fees</h2>
+    <p>AAPC sells exam vouchers: {h.usd(A.voucher.core.one)} for one attempt or {h.usd(A.voucher.core.two)} for two on its core exams (CPC, CIC, CRC, COC, CPB and others), {h.usd(A.voucher.student.one)} or {h.usd(A.voucher.student.two)} at its student pricing, as listed in the answers of its <Fragment set:html={h.src('aapc_exams', 'certification exams page')} />. AHIMA charges a member and a non-member fee for each exam, read on its certification pages ({h.ext(h.P.sources.ahima.url, 'ahima.org')}).</p>
+    <h2>2. Retakes</h2>
+    <p>AHIMA publishes the first-time pass rate of each exam for 2023, 2024 and 2025. When a calculator counts “expected sittings”, it divides one by the latest rate: a candidate who passes each sitting with the same chance needs that many sittings on average. This is an average over many candidates, not a forecast for you. AAPC publishes no pass rate on the pages we read, so its calculators count the sittings you choose. The voucher calculator compares a 2-attempt voucher with a 1-attempt voucher plus a second one bought only after a fail; at a 70% chance, the second route averages {h.usd(ex.expectedSingles, 2)} against {h.usd(ex.two)}.</p>
+    <h2>3. Membership, renewal and CEUs</h2>
+    <p>AAPC requires yearly membership to keep a credential ({h.usd(A.membership.individual)} for an individual, {h.usd(A.membership.student)} for a new AAPC student member, {h.usd(A.membership.renewal)} at renewal) and {A.ceu.perCycle} CEUs every {A.ceu.cycleYears} years. AHIMA membership is optional ({h.usd(H.membership.professional)} for a professional member); its recertification fee is due every {H.recert.cycleYears} years, {h.usd(H.recert.member)} for a member and {h.usd(H.recert.nonMember)} for a non-member, with {H.recert.ceus.ccs} CEUs for the CCA, CCS and CCS-P. The cost of earning CEUs depends on how you earn them and is never counted.</p>
+    <h2>4. Courses and books</h2>
+    <p>No course price is loaded: this site sells none and lists none, and course prices quoted by schools are not comparable. You type yours. Book prices shown are the AAPC member and non-member prices of one bundle, as an example.</p>
+    <h2>5. Programs by state</h2>
+    <p>The state counts come from the IPEDS Completions file {I.year} ({I.release}), program code {I.cip}, “{I.title}”, first majors only. They count awards, not schools that teach coding: a school can file its program under another code. {I.absent.join(', ')} report no award under this code.</p>
+    <h2>6. What is left out</h2>
+    <p>NHA's CBCS is not costed: its site refused our reading. Salaries are not shown on any page. State rules are not covered: the credentials here are national.</p>
+    <p>Method version of <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, 'en-US')}</time>. A figure that looks wrong: <a href={route('contact', lang)}>contact</a>.</p>
+  </div>
+</PageLayout>

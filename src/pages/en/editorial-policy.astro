@@ -1,0 +1,26 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { AUTHOR_NAME, CONTACT_EMAIL, LAST_UPDATED, SITE_NAMES } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+import { displayDate } from '../../lib/format';
+const lang = 'en';
+---
+<PageLayout title={`Editorial policy of ${SITE_NAMES[lang]}: sources and corrections`} description="Which AAPC, AHIMA and federal pages Medical Coding Cost relies on, which sources it refuses, why it shows no salary, and how a mistake is corrected and dated." lang={lang} noindex={true} breadcrumbs={[{ label: 'Editorial policy' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Editorial and corrections policy</h1>
+    <p>A future coder pays for a course, a voucher, a membership and books before earning anything from the credential. A wrong fee or a wrong rule costs money, so every figure here names the page it was read on, with the date.</p>
+    <h2>Who is responsible</h2><p>{AUTHOR_NAME}, reachable at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+    <h2>What we read</h2>
+    <ul>
+      <li>AAPC pages: certification exams and voucher prices, the CPC, COC, CIC, CRC and CPB pages, taking the CPC exam, after the CPC, membership options, rescheduling;</li>
+      <li>AHIMA pages: the CCA, CCS, CCS-P and RHIT certification pages, the Recertification Guide and the membership types, cited by name and linked at AHIMA's home page, as its terms ask;</li>
+      <li>the federal IPEDS completions file of the National Center for Education Statistics, a public domain source.</li>
+    </ul>
+    <h2>Sources we refuse</h2><p>Schools, course sellers, lead-generation sites and salary aggregators never supply a figure here. When a page could not be read (NHA's site refuses automated reading), its credential is left out rather than costed from a third party.</p>
+    <h2>What we do not publish</h2><p>No salary or wage figure, no ranking of schools, no practice questions copied from anyone, and no medical content: the site covers fees, formats, deadlines and renewal rules only.</p>
+    <h2>Review cycle</h2><p>Fees are read again when AAPC or AHIMA changes a page, and at least every three months. A change announced for a later date is shown with that date, never as current.</p>
+    <h2>Corrections</h2>
+    <ol><li>We read the source again.</li><li>We correct the parameter file and add a test for the case.</li><li>The site rebuilds and every page shows the new date.</li></ol>
+    <h2>Independence</h2><p>No credentialing body, vendor or school pays for or reviews what is published, and there is no affiliate link. See the <a href={route('method', lang)}>method page</a>. Version of <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, 'en-US')}</time>.</p>
+  </div>
+</PageLayout>

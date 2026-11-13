@@ -1,0 +1,85 @@
+---
+/**
+ * Home: the two-credential comparator first, then the fees of every credential, the formats, renewal, AHIMA's pass
+ * rates and every page by group. Every figure is read from params-2026.json through the engine.
+ */
+import PageLayout from '../layouts/PageLayout.astro';
+import Tool from './Tool.astro';
+import Clamp from './Clamp.astro';
+import Sources from './Sources.astro';
+import { route, hasRoute } from '../i18n/routes';
+import { PAGES } from '../lib/guides';
+import { GROUPS_ORDER, groupLabel } from '../i18n/nav';
+import { helpers } from '../lib/helpers';
+import { t } from '../i18n/ui';
+import { LAST_UPDATED, AUTHOR_NAME } from '../data/site-config';
+import { displayDate } from '../lib/format';
+import { faqSchema, webApplicationSchema, websiteSchema, organizationSchema } from '../lib/seo';
+const lang = 'en';
+const ui = t(lang);
+const h = helpers(lang, !process.env.LAX);
+const { A, H, E } = h;
+const cards = (g: (typeof GROUPS_ORDER)[number]) => PAGES.filter((p) => p.group === g).map((p) => ({ href: route(p.id, lang), name: p.en.nav, text: p.en.card }));
+const href = (id: string) => (hasRoute(id, lang) ? route(id, lang) : route('home', lang));
+const a = (id: string, text: string) => `<a href="${href(id)}">${text}</a>`;
+const cpc2 = E.totalCost({ id: 'cpc', member: true, prep: 0, books: 0, years: 2 });
+const ccs2 = E.totalCost({ id: 'ccs', member: false, prep: 0, books: 0, years: 2 });
+const title = 'Medical Coding Certification Cost: CPC, CCS, CCA Compared';
+const description = 'Medical coding certification cost in 2026: AAPC vouchers, AHIMA exam fees, dues, retakes and renewal for CPC, COC, CPB, CCA, CCS and CCS-P, side by side.';
+const faqs = [
+  { q: 'How much does a medical coding certification cost?', a: `The exam alone is ${h.usd(H.exams.cca.member)} to ${h.usd(A.voucher.core.two)} depending on the credential and the body. With the first year of AAPC dues, a CPC costs at least ${h.usd(A.voucher.core.one + A.membership.individual)}; an AHIMA CCS taken as a non-member costs ${h.usd(H.exams.ccs.nonMember)} per sitting. Training, often the largest line, comes on top and varies from one school to another.` },
+  { q: 'Is the CPC or the CCS cheaper over two years?', a: `Over two years, with no course counted, the CPC adds up to ${h.usd(cpc2.total)} with one sitting and two years of AAPC dues. The CCS taken as a non-member adds up to ${h.usd(ccs2.total)}, counting the retakes AHIMA's 2025 first-time pass rate implies and one recertification fee. Change the years in the comparator to see where the order flips.` },
+  { q: 'Do I have to join AAPC to take the CPC exam?', a: `Yes. AAPC lists a current membership among the basic requirements to sit its exams, and asks members to keep paying dues and earn ${A.ceu.perCycle} CEUs every ${A.ceu.cycleYears} years to keep the credential. Individual dues are ${h.usd(A.membership.individual)} a year; a new member enrolled in an AAPC course pays ${h.usd(A.membership.student)}.` },
+  { q: 'Which bodies issue medical coding credentials?', a: 'Two national associations issue the coding credentials most job ads name: AAPC (CPC, COC, CIC, CRC, CPB and specialty credentials) and AHIMA (CCA, CCS, CCS-P). Neither is a government body. NHA also offers a billing and coding credential, the CBCS, which this site does not cost because its pages could not be read.' },
+  { q: 'How much is AHIMA membership, and is it required?', a: `It is optional. AHIMA lists Professional membership at ${h.usd(H.membership.professional)} a year, Professional Premier at ${h.usd(H.membership.premier)} and Student at ${h.usd(H.membership.student)}. Members pay ${h.usd(H.exams.ccs.nonMember - H.exams.ccs.member)} less per CCS sitting and ${h.usd(H.recert.member)} instead of ${h.usd(H.recert.nonMember)} to recertify, so membership pays only when those savings beat the dues.` },
+  { q: 'How long is an AAPC exam voucher valid?', a: `AAPC exam vouchers are valid for ${A.voucherValidMonths} months from purchase and are not refundable. Buy one when you can name a month for the exam: a voucher bought too early and left unused is lost money, and AAPC holds no exams from late December until ${A.blackout.resumes}.` },
+  { q: 'How long do I have to take an AHIMA exam once approved?', a: `AHIMA gives an eligibility window of ${H.scheduleWithinDays} days after it approves the application, and the Pearson VUE appointment must fall inside it. Moving the appointment is free up to ${H.pearson.freeBusinessDays} business days before the date and costs ${h.usd(H.pearson.fee)} after that, down to ${H.pearson.feeToHours} hours before.` },
+];
+const jsonLd = [websiteSchema(lang), organizationSchema(lang), webApplicationSchema({ name: 'Medical coding credential cost comparator', description, path: route('home', lang), lang }), faqSchema(faqs, lang)];
+const resume = `A medical coding certification is earned from one of two private associations, AAPC or AHIMA, and both price it differently. AAPC sells exam vouchers, ${h.usd(A.voucher.core.one)} for one attempt or ${h.usd(A.voucher.core.two)} for two on its core exams such as the CPC, and requires a yearly membership, ${h.usd(A.membership.individual)}, both to sit the exam and to keep the credential. AHIMA charges a fee per sitting, lower for its members: ${h.usd(H.exams.cca.member)} or ${h.usd(H.exams.cca.nonMember)} for the CCA, ${h.usd(H.exams.ccs.member)} or ${h.usd(H.exams.ccs.nonMember)} for the CCS and the CCS-P, then a recertification fee every two years. AHIMA publishes first-time pass rates, from ${h.pc(E.passRate('ccsp')!.rate)} on the CCS-P to ${h.pc(E.passRate('ccs')!.rate)} on the CCS in 2025, so the comparator counts the retakes they imply. Fees were read on the AAPC and AHIMA pages on ${h.read}. This site is independent of both bodies and sells no course.`;
+const feeRows = E.CREDS.map((c) => c.body === 'AAPC'
+  ? [`${c.code}, ${c.name}`, 'AAPC', `${h.usd(A.voucher.core.one)} (1 attempt), ${h.usd(A.voucher.core.two)} (2)`, `${h.usd(A.membership.individual)} a year, required`]
+  : [`${c.code}, ${c.name}`, 'AHIMA', `${h.usd(E.examFee(c.id, { member: true }))} member, ${h.usd(E.examFee(c.id, { member: false }))} non-member`, `${h.usd(H.membership.professional)} a year, optional`]);
+const passRows = (['cca', 'ccs', 'ccsp'] as const).map((id) => [E.credById(id).code, ...E.passRates(id).map((r) => `${h.pc(r.rate)} (${h.num(r.testers)})`)]);
+---
+<PageLayout title={title} description={description} lang={lang} jsonLd={jsonLd} faqs={faqs} breadcrumbs={[]}>
+  <header class="mb-3">
+    <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-accent-600">AAPC and AHIMA fees, read {h.read}</p>
+    <h1 class="mt-0 text-[1.75rem] font-bold text-navy-900 max-sm:leading-tight sm:text-3xl md:text-4xl">Medical coding certification cost: CPC, CCS, CCA and more</h1>
+    <p class="mt-2 text-base text-navy-700 sm:text-lg">The medical coding certification cost starts at {h.usd(A.voucher.core.one)} for a CPC exam voucher plus {h.usd(A.membership.individual)} of AAPC dues, and {h.usd(H.exams.ccs.nonMember)} for an AHIMA CCS sitting. Pick two credentials to see exam, dues and renewal over the years you keep them.</p>
+    <p data-chrome data-independant class="mt-1 text-xs font-medium text-navy-600">{ui.independent}</p>
+  </header>
+  <div data-outil class="mb-4"><Tool tool={{ kind: 'mini:compare' }} primary={true} /></div>
+  <Clamp text={resume} id="clamp-home" lang={lang} class="mb-3" />
+  <p class="mb-8 text-sm text-navy-600">Fees checked on <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, 'en-US')}</time> · {AUTHOR_NAME} · <a href={route('method', lang)} class="underline hover:text-navy-900">How the costs are added up</a> · <a href={route('about', lang)} class="underline hover:text-navy-900">About this site</a></p>
+
+  <div class="prose prose-slate max-w-none">
+    <h2>Medical coding certification cost, credential by credential</h2>
+    <p>The table gives what each body charges for one exam and what it charges to stay a member. AAPC uses one price for all its core exams, so the CPC, the COC, the CIC, the CRC and the CPB cost the same to sit. AHIMA prices each exam and gives members {h.usd(H.exams.ccs.nonMember - H.exams.ccs.member)} off.</p>
+    <Fragment set:html={h.table(['Credential', 'Body', 'Exam', 'Membership'], feeRows, `AAPC voucher prices and dues read on aapc.com; AHIMA fees read on its certification pages, ${h.read}.`, ['l', 'l', 'l', 'l'])} />
+    <p>AAPC also lists student pricing: vouchers at {h.usd(A.voucher.student.one)} or {h.usd(A.voucher.student.two)} and student dues of {h.usd(A.membership.student)} for a new member enrolled in an AAPC course. The <Fragment set:html={a('cpc-exam-cost', 'CPC exam cost page')} /> says when the 2-attempt voucher pays for itself.</p>
+
+    <h2>What the exams look like</h2>
+    <p>The CPC has {A.cpc.questions} multiple-choice questions in {h.hm(A.cpc.minutes)}, and you pass with {A.cpc.passCorrect} right answers. AHIMA exams mix scored and unscored pretest questions and report a scaled score, with {H.passScore} to pass: the CCA has {H.exams.cca.items} questions in {h.hm(H.exams.cca.minutes)}, the CCS {H.exams.ccs.items} in {h.hm(H.exams.ccs.minutes)}, the CCS-P {H.exams.ccsp.items} in {h.hm(H.exams.ccsp.minutes)}. Code books are allowed in all of them, which is why their edition year matters: see <Fragment set:html={a('medical-coding-code-books', 'code books')} />.</p>
+
+    <h2>Pass rates AHIMA publishes</h2>
+    <p>AHIMA publishes the first-time pass rate of each exam for the last three years, with the number of first-time testers. AAPC publishes no rate on the pages we read, which is why the CPC is counted with the sittings you choose.</p>
+    <Fragment set:html={h.table(['Exam', '2023', '2024', '2025'], passRows, 'First-time pass rate (number of first-time testers), as AHIMA publishes it.', ['l', 'r', 'r', 'r'])} />
+    <p>Read them as an average across all first-time candidates, not as your chance. The <Fragment set:html={a('medical-coding-pass-rates', 'pass rate page')} /> turns them into expected sittings and fees.</p>
+
+    <h2>Keeping the credential</h2>
+    <p>A credential is not paid once. AAPC asks for yearly dues of {h.usd(A.membership.renewal)} and {A.ceu.perCycle} continuing education units (CEUs) every {A.ceu.cycleYears} years. AHIMA asks for {H.recert.ceus.ccs} CEUs every {H.recert.cycleYears} years for its coding credentials and a recertification fee of {h.usd(H.recert.member)} for members or {h.usd(H.recert.nonMember)} for non-members. Over five years, these lines can weigh more than the exam: the <Fragment set:html={a('medical-coding-ceu-requirements', 'renewal calculator')} /> adds them.</p>
+
+    <h2>Every page of the site</h2>
+  </div>
+  <div class="not-prose mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" data-sommaire>
+    {GROUPS_ORDER.map((g) => (
+      <section><h3 class="mb-2 text-lg font-semibold text-navy-900">{groupLabel(g)}</h3><ul class="space-y-2 text-sm">{cards(g).map((c) => <li><a href={c.href} class="font-medium text-accent-700 underline">{c.name}</a><span class="block text-navy-700">{c.text}</span></li>)}</ul></section>
+    ))}
+  </div>
+  <div class="prose prose-slate mt-8 max-w-none">
+    <h2>Independent, and what that means</h2>
+    <p>{AUTHOR_NAME} publishes this site on its own. It is not AAPC, AHIMA, NHA or a school, it sells no course and it takes no referral fee. It shows no salary figure. AHIMA asks for written approval before anyone links to its inner pages, so AHIMA figures name the page they come from and link to its home page.</p>
+    <Sources lang={lang} intro="The fees, formats, pass rates and counts on this site were read on these pages of AAPC, AHIMA, Pearson VUE and the National Center for Education Statistics, on" />
+  </div>
+</PageLayout>
