@@ -82,7 +82,9 @@ export interface TotalOut { exam: number; joinDues: number; renewal: number; pre
 export function totalCost(i: TotalIn): TotalOut {
   const years = Math.max(1, Math.round(i.years));
   const ahima = isAhima(i.id);
-  let sittings = i.sittings ?? (ahima ? expectedAttempts(passRate(i.id)!.rate) : 1);
+  // One sitting unless the caller says otherwise, for AAPC and AHIMA alike: a comparison must count both the same way
+  // (naive testers, 2026-11-14: the CPC was counted once and the AHIMA exams with their expected retakes).
+  let sittings = i.sittings ?? 1;
   let exam: number;
   if (ahima) exam = examFee(i.id, { member: i.member }) * sittings;
   else {
@@ -95,13 +97,28 @@ export function totalCost(i: TotalIn): TotalOut {
   else { joinDues = i.student ? A.membership.student : A.membership.individual; ren = (years - 1) * A.membership.renewal; }
   const total = exam + joinDues + ren + Math.max(0, i.prep) + Math.max(0, i.books);
   const lines: Array<[string, number]> = [
-    [ahima ? `Exam fee${sittings > 1.001 ? 's, expected sittings' : ''}` : 'Exam voucher' + (Math.ceil(sittings) > (i.twoAttempt ? 2 : 1) ? 's' : ''), exam],
+    [ahima ? (sittings > 1.001 ? (Number.isInteger(sittings) ? `Exam fees, ${sittings} sittings` : 'Exam fees, retakes included on average') : 'Exam fee, 1 sitting') : (i.twoAttempt ? '2-attempt exam voucher' : 'Exam voucher' + (Math.ceil(sittings) > 1 ? 's' : ', 1 attempt')), exam],
   ];
   if (!ahima) lines.push([i.student ? 'AAPC student membership, first year' : 'AAPC membership, first year', joinDues]);
   if (ren > 0) lines.push([ahima ? (i.member ? 'AHIMA dues and recertification' : 'AHIMA recertification fees') : `AAPC renewals, ${years - 1} more year${years - 1 === 1 ? '' : 's'}`, ren]);
   if (i.prep > 0) lines.push(['Course or review you buy', i.prep]);
   if (i.books > 0) lines.push(['Code books', i.books]);
   return { exam, joinDues, renewal: ren, prep: Math.max(0, i.prep), books: Math.max(0, i.books), total, sittings, lines };
+}
+
+/**
+ * Two credentials under the same assumptions: the same years, the same number of sittings (1 = pass the first time,
+ * 2 = one retake), no course and no books. A second AAPC sitting is bought as the 2-attempt voucher, AAPC's own price
+ * for a retake; a second AHIMA sitting is a second fee. AAPC membership is required by AAPC, so it is always counted;
+ * AHIMA membership only when `ahimaMember`.
+ */
+export function compareTwo(a: CredId, b: CredId, o: { years: number; sittings: number; ahimaMember: boolean }) {
+  const sittings = Math.max(1, Math.min(2, Math.round(o.sittings)));
+  const one = (id: CredId) => totalCost({ id, member: isAhima(id) ? o.ahimaMember : true, sittings, twoAttempt: !isAhima(id) && sittings === 2, prep: 0, books: 0, years: o.years });
+  const ta = one(a), tb = one(b);
+  const diff = Math.abs(ta.total - tb.total);
+  const cheaper: CredId | null = ta.total === tb.total ? null : ta.total < tb.total ? a : b;
+  return { a: ta, b: tb, diff, cheaper, sittings };
 }
 
 /** AHIMA member against non-member over `years`, for one exam taken `sittings` times (expected from the pass rate by default). */

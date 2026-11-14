@@ -28,7 +28,7 @@ export default definePage({
     body: (h) => {
       const rows = h.E.passRates('cca').map((r) => [String(r.year), h.num(r.testers), h.pc(r.rate), h.usd(h.H.exams.cca.nonMember * h.E.expectedAttempts(r.rate))]);
       return `
-<h2>CCA certification fees and expected sittings</h2>
+<h2>CCA certification fees, retakes included</h2>
 <p>The fee is paid with each application, so a retake costs the same again. The last column multiplies the non-member fee by the sittings the average first-time rate implies.</p>
 ${h.table(['Year', 'First-time testers', 'Pass rate', 'Expected non-member fees'], rows, `${h.num(X.certified)} CCA holders at the end of 2025, as AHIMA reports it.`, ['l', 'r', 'r', 'r'])}
 

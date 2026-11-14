@@ -34,7 +34,7 @@ export default definePage({
 
 <h2>Keeping the CPC</h2>
 <p>Every year: membership. Every two years: ${h.A.ceu.perCycle} CEUs. AAPC grants CEUs for its own courses once you are certified, for example 40 CEUs for its CPC preparation course, but issues none before certification. The ${h.a('medical-coding-ceu-requirements', 'renewal page')} compares this with AHIMA's rules.</p>
-${h.table(['Years held', 'Exam and dues', 'CEUs earned in that time'], [1, 2, 3, 5].map((y) => [String(y), h.usd(h.E.totalCost({ id: 'cpc', member: true, prep: 0, books: 0, years: y }).total), String(h.E.renewal('cpc', { member: true, years: y }).ceus)]), 'One-attempt voucher, individual dues, no course or books.', ['l', 'r', 'r'])}
+${h.table(['Years you hold the CPC', 'Exam and dues', 'CEUs due by then (36 every 2 years)'], [1, 2, 3, 4, 5].map((y) => [`After ${y} year${y === 1 ? '' : 's'}`, h.usd(h.E.totalCost({ id: 'cpc', member: true, prep: 0, books: 0, years: y }).total), String(h.E.renewal('cpc', { member: true, years: y }).ceus)]), 'One-attempt voucher, individual dues, no course or books.', ['l', 'r', 'r'])}
 
 <h2>The CPC-A stage</h2>
 <p>Pass without ${h.A.apprentice.years} years of coding experience and the credential carries an A. A course of ${h.A.apprentice.courseHours} hours or more waives one of the two years. The ${h.a('how-to-become-a-medical-coder', 'steps page')} counts the months left, and the ${h.a('cpc-exam', 'CPC exam page')} breaks down the ${h.A.cpc.questions} questions.</p>

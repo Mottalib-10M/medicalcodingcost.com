@@ -35,7 +35,7 @@ ${h.table(['Exam', '2023', '2024', '2025', 'Holders, end of 2025'], rows, 'First
 
 <h2>Fees to expect at the latest rate</h2>
 <p>Multiply the fee of one sitting by the sittings the ${y} rate implies. The member column leaves out the dues of ${h.usd(h.H.membership.professional)} a year.</p>
-${h.table(['Exam', 'Expected sittings', 'Member fees', 'Non-member fees'], fees, `Expected sittings = 1 / first-time pass rate, ${y}.`, ['l', 'r', 'r', 'r'])}
+${h.table(['Exam', 'Average tries per person', 'Member fees', 'Non-member fees'], fees, `Average tries per person = 1 / first-time pass rate, ${y}.`, ['l', 'r', 'r', 'r'])}
 
 <h2>How to use a rate you cannot control</h2>
 <p>Treat the expected fees as a budget line, not a prediction. A full timed practice exam tells you more about your own odds: the ${h.a('medical-coding-practice-test', 'practice test page')} compares your score with the pass mark. On the AAPC side, the 2-attempt voucher plays the role of a retake budget; the ${h.a('cpc-exam-cost', 'CPC exam cost page')} shows when it pays.</p>

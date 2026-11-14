@@ -5,7 +5,7 @@ import type { Group } from '../lib/guide-types';
 export interface NavLink { href: string; label: string } export interface NavCategory { label: string; links: NavLink[] }
 const CORE: Record<string, string> = { home: 'Cost comparator', method: 'Method and sources', about: 'About', widget: 'Embed the comparator', contact: 'Contact', editorial: 'Editorial policy', privacy: 'Privacy', terms: 'Legal notice', cookies: 'Cookies' };
 /** Short labels for the top menu (one or two words, MASTERFACTORY §10.3); full labels in the footer and on the home page. */
-const GROUP_SHORT: Record<Group, string> = { start: 'Getting started', aapc: 'CPC (AAPC)', ahima: 'CCA, CCS (AHIMA)', keep: 'Costs, renewal' };
+const GROUP_SHORT: Record<Group, string> = { start: 'Getting started', aapc: 'CPC (AAPC)', ahima: 'CCA, CCS, CCS-P (AHIMA)', keep: 'Costs, renewal' };
 const GROUP_LABEL: Record<Group, string> = { start: 'Becoming a medical coder', aapc: 'CPC and the other AAPC credentials', ahima: 'CCA, CCS and CCS-P (AHIMA)', keep: 'Costs, rescheduling and renewal' };
 export const GROUPS_ORDER: Group[] = ['start', 'aapc', 'ahima', 'keep'];
 export const groupLabel = (g: Group, _lang: Locale = 'en') => GROUP_LABEL[g];

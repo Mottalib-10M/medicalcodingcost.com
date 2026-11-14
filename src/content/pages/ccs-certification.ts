@@ -29,7 +29,7 @@ export default definePage({
       return `
 <h2>CCS certification pass rates</h2>
 <p>AHIMA publishes the first-time pass rate and the number of first-time testers. The rate rose sharply in three years while the number of testers almost doubled.</p>
-${h.table(['Year', 'First-time testers', 'Pass rate', 'Expected sittings'], rows, `${h.num(h.H.exams.ccs.certified)} CCS holders at the end of 2025, as AHIMA reports it.`, ['l', 'r', 'r', 'r'])}
+${h.table(['Year', 'First-time testers', 'Pass rate', 'Average tries per person'], rows, `${h.num(h.H.exams.ccs.certified)} CCS holders at the end of 2025, as AHIMA reports it.`, ['l', 'r', 'r', 'r'])}
 
 <h2>The exam</h2>
 <p>${h.H.exams.ccs.items} questions, of which ${h.H.exams.ccs.items - h.H.exams.ccs.scored} are unscored pretest items mixed in, in ${h.hm(h.H.exams.ccs.minutes)} at a Pearson VUE center. The questions follow five domains. From May 1, 2026, candidates bring the code books on AHIMA's 2026 list; without the right books they are not allowed to test and forfeit the fee. Arriving late counts as a no-show, which also forfeits it.</p>

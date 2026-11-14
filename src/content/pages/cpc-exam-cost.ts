@@ -27,7 +27,7 @@ export default definePage({
       const rows = [50, 60, 70, 80, 90].map((p) => { const r = h.E.voucherChoice(p / 100); return [`${p}%`, h.usd(r.expectedSingles), h.usd(r.two), r.better === 'two' ? '2 attempts' : '1 attempt']; });
       return `
 <h2>CPC exam cost by voucher</h2>
-${h.table(['Voucher', 'Regular price', 'Student price'], [['1 attempt', h.usd(h.A.voucher.core.one), h.usd(h.A.voucher.student.one)], ['2 attempts', h.usd(h.A.voucher.core.two), h.usd(h.A.voucher.student.two)], ['Second attempt, in effect', h.usd(h.A.voucher.core.two - h.A.voucher.core.one), h.usd(h.A.voucher.student.two - h.A.voucher.student.one)]], `AAPC core exam and student prices, read ${h.read}.`, ['l', 'r', 'r'])}
+${h.table(['Voucher', 'Regular price', 'Student price'], [['1 attempt', h.usd(h.A.voucher.core.one), h.usd(h.A.voucher.student.one)], ['2 attempts', h.usd(h.A.voucher.core.two), h.usd(h.A.voucher.student.two)], ['Extra cost of the second attempt', h.usd(h.A.voucher.core.two - h.A.voucher.core.one), h.usd(h.A.voucher.student.two - h.A.voucher.student.one)]], `AAPC core exam and student prices, read ${h.read}. The last line is the 2-attempt price minus the 1-attempt price. The student discount is ${h.usd(h.A.voucher.core.one - h.A.voucher.student.one)} on the 1-attempt voucher and ${h.usd(h.A.voucher.core.two - h.A.voucher.student.two)} on the 2-attempt one, which is why the second attempt looks ${h.usd((h.A.voucher.student.two - h.A.voucher.student.one) - (h.A.voucher.core.two - h.A.voucher.core.one))} dearer at the student price.`, ['l', 'r', 'r'])}
 <p>AAPC's specialty exams cost less (${h.usd(h.A.voucher.specialty.one)} and ${h.usd(h.A.voucher.specialty.two)}), but the CPC is a core exam.</p>
 
 <h2>When the second attempt pays</h2>

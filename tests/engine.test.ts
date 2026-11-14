@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import P from '../src/data/params-2026.json';
-import { examFee, expectedAttempts, voucherChoice, renewal, totalCost, ahimaMembership, practiceGap, secondMonday, inBlackout, aapcTimeline, apprentice, rescheduleFee, passRate, IPEDS, ipedsTotal, IPEDS_SORTED, isoOf, pace } from '../src/lib/engine/coding';
+import { compareTwo, examFee, expectedAttempts, voucherChoice, renewal, totalCost, ahimaMembership, practiceGap, secondMonday, inBlackout, aapcTimeline, apprentice, rescheduleFee, passRate, IPEDS, ipedsTotal, IPEDS_SORTED, isoOf, pace } from '../src/lib/engine/coding';
 import { getSpec, SPEC_IDS } from '../src/lib/mini-specs';
 
 describe('fees', () => {
@@ -30,8 +30,9 @@ describe('totals and renewal', () => {
   it('CPC over two years = voucher + two years of dues', () => {
     expect(totalCost({ id: 'cpc', member: true, prep: 0, books: 0, years: 2 }).total).toBe(425 + 229 + 229);
   });
-  it('CCS non-member over two years counts expected sittings and one recertification', () => {
-    const t = totalCost({ id: 'ccs', member: false, prep: 0, books: 0, years: 2 });
+  it('CCS non-member over two years: one sitting by default, expected sittings only when asked', () => {
+    expect(totalCost({ id: 'ccs', member: false, prep: 0, books: 0, years: 2 }).total).toBe(399 + 218);
+    const t = totalCost({ id: 'ccs', member: false, sittings: expectedAttempts(0.84), prep: 0, books: 0, years: 2 });
     expect(t.total).toBeCloseTo(399 / 0.84 + 218, 6);
   });
   it('AHIMA renewal: fee per full cycle, extras added', () => {
@@ -96,5 +97,41 @@ describe('IPEDS and calculators', () => {
       expect(r.head[1], id).toBeTruthy();
       expect(JSON.stringify(r), id).not.toMatch(/NaN|undefined/);
     }
+  });
+});
+
+// Naive testers, 2026-11-14: the home comparator counted the CPC with one sitting and the CCS with the retakes its pass
+// rate implies, so "Cheaper of the two: CCS" was not a like-for-like verdict. Both sides now share the same sittings.
+describe('comparisons count both credentials the same way', () => {
+  it('one sitting each, then one retake each', () => {
+    const one = compareTwo('cpc', 'ccs', { years: 2, sittings: 1, ahimaMember: false });
+    expect(one.a.total).toBe(425 + 229 + 229);
+    expect(one.b.total).toBe(399 + 218);
+    expect(one.a.sittings).toBe(one.b.sittings);
+    const two = compareTwo('cpc', 'ccs', { years: 2, sittings: 2, ahimaMember: false });
+    expect(two.a.total).toBe(499 + 229 + 229);
+    expect(two.b.total).toBe(2 * 399 + 218);
+    expect(two.a.sittings).toBe(2);
+    expect(two.b.sittings).toBe(2);
+    expect(two.cheaper).toBe('cpc');
+    expect(two.diff).toBe(2 * 399 + 218 - (499 + 458));
+  });
+  it('no AHIMA exam gets fractional retakes in a comparison, whatever the pair', () => {
+    for (const a of ['cpc', 'cca', 'ccs', 'ccsp'] as const) for (const b of ['cpc', 'cca', 'ccs', 'ccsp'] as const) for (const n of [1, 2]) {
+      const r = compareTwo(a, b, { years: 3, sittings: n, ahimaMember: false });
+      expect(r.a.sittings, `${a}/${b}/${n}`).toBe(n);
+      expect(r.b.sittings, `${a}/${b}/${n}`).toBe(n);
+    }
+  });
+  it('home and CCS-P calculators show each total first, then the difference, then the shared assumption', () => {
+    for (const [kind, v] of [['compare', { a: 0, b: 6, y: 2, n: 1, m: 0 }], ['ccsp-cpc', { y: 4, n: 1, m: 0 }]] as const) {
+      const out = getSpec(kind).run({ ...v });
+      expect(out.head[1], kind).toMatch(/^\$[\d,]+ · \$[\d,]+$/);
+      expect(out.rows[2][0], kind).toMatch(/^Difference/);
+      expect(out.rows[3], kind).toEqual(['Counted the same way for both', '1 sitting each, no course, no books']);
+    }
+    const home = getSpec('compare').run({ a: 0, b: 6, y: 2, n: 1, m: 0 });
+    expect(home.head[1]).toBe('$883 · $617');
+    expect(home.rows[2]).toEqual(['Difference: the CCS costs less by', '$266']);
   });
 });
