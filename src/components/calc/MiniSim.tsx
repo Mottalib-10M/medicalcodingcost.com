@@ -80,7 +80,7 @@ export default function MiniSim({ kind, lang = 'en', href, title, idPrefix = 'm'
         <div aria-live="polite" className="rounded-lg bg-navy-50 p-4">
           <MentionExemple lang={lang} touched={touched} modifiables={visibles.length} suppose={exemple ?? exempleSuppose(spec.exemple, v)} />
           <p className="text-sm font-medium text-navy-600">{out.head[0]}</p>
-          <p className="tabular-nums mt-1 text-3xl font-bold text-navy-900">{out.head[1]}</p>
+          <p className="tabular-nums mt-1 whitespace-pre-line text-3xl font-bold text-navy-900">{out.head[1]}</p>
           {out.alert && <p data-alerte role="note" className="mt-2 border-l-4 border-amber-500 pl-2 text-sm font-semibold text-navy-900">{out.alert}</p>}
           <table className="mt-3 w-full text-sm"><tbody className="divide-y divide-navy-200">
             {out.rows.map(([l, x]) => (valeurEnMots(x)
@@ -90,7 +90,7 @@ export default function MiniSim({ kind, lang = 'en', href, title, idPrefix = 'm'
           {out.note && <p className="mt-2 text-xs text-navy-500">{out.note}</p>}
         </div>
       </div>
-      {lien && <a data-lien-reponse={out.go ? '' : undefined} href={lien[1]} className="mt-4 inline-block text-sm font-medium text-accent-700 hover:underline">{lien[0]}</a>}
+      {lien && <a data-lien-reponse={out.go ? '' : undefined} href={lien[1]} className="mt-4 inline-block rounded-lg border border-accent-300 bg-accent-50 px-3 py-2 text-sm font-semibold text-accent-800 hover:bg-accent-100">{lien[0]}</a>}
     </div>
   );
 }

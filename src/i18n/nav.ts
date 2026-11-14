@@ -15,7 +15,8 @@ export const inGroup = (g: Group, lang: Locale) => PAGES.filter((p) => p.group =
 export function navCategories(lang: Locale, short = true): NavCategory[] {
   return GROUPS_ORDER.map((g) => ({ label: short ? GROUP_SHORT[g] : GROUP_LABEL[g], links: inGroup(g, lang) })).filter((c) => c.links.length);
 }
-export const navDirect = (_lang: Locale): NavLink[] => [];
+/** Direct links (naive testers, 2nd round: the comparator, the site's main tool, was missing from the menu). */
+export const navDirect = (lang: Locale): NavLink[] => [{ href: route('home', lang), label: 'Compare credentials' }];
 export const footerColumns = (lang: Locale): NavCategory[] => [
   ...navCategories(lang, false),
   { label: 'This site', links: ['home', 'method', 'about', 'contact', 'editorial', 'widget', 'terms', 'privacy', 'cookies'].map((i) => link(i, lang)) },

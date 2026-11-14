@@ -11,7 +11,7 @@ export default definePage({
   en: {
     slug: 'how-long-does-it-take-to-become-a-medical-coder',
     nav: 'Time to become a coder',
-    card: 'From the first day of training to the exam result: study months, booking, the year-end blackout and results.',
+    card: 'From the first day of training to the exam result: study months, booking, the year-end break when no exam is held, and results.',
     title: 'Time to Become a Medical Coder: Course, Exam and Results',
     description: `Time to become a medical coder: ${P.aapc.prepMonths[0]} to ${P.aapc.prepMonths[1]} months of study as AAPC puts it, booking ${P.aapc.registerWeeksBefore} weeks ahead, no exams from December ${P.aapc.blackout.startDay}, results in ${P.aapc.resultsBusinessDays[0]} to ${P.aapc.resultsBusinessDays[1]} business days.`,
     h1: 'Time to become a medical coder, from first class to result',

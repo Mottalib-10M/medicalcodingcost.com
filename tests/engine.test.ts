@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import P from '../src/data/params-2026.json';
-import { compareTwo, examFee, expectedAttempts, voucherChoice, renewal, totalCost, ahimaMembership, practiceGap, secondMonday, inBlackout, aapcTimeline, apprentice, rescheduleFee, passRate, IPEDS, ipedsTotal, IPEDS_SORTED, isoOf, pace } from '../src/lib/engine/coding';
+import { readFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { compareTwo, standardCost, assumption, DEFAULTS, examFee, expectedAttempts, voucherChoice, renewal, totalCost, ahimaMembership, practiceGap, secondMonday, inBlackout, aapcTimeline, apprentice, rescheduleFee, passRate, IPEDS, ipedsTotal, IPEDS_SORTED, isoOf, pace } from '../src/lib/engine/coding';
 import { getSpec, SPEC_IDS } from '../src/lib/mini-specs';
 
 describe('fees', () => {
@@ -123,15 +125,60 @@ describe('comparisons count both credentials the same way', () => {
       expect(r.b.sittings, `${a}/${b}/${n}`).toBe(n);
     }
   });
-  it('home and CCS-P calculators show each total first, then the difference, then the shared assumption', () => {
-    for (const [kind, v] of [['compare', { a: 0, b: 6, y: 2, n: 1, m: 0 }], ['ccsp-cpc', { y: 4, n: 1, m: 0 }]] as const) {
+  it('home and CCS-P calculators show each total first, named, then the difference, with the assumption in the label', () => {
+    for (const [kind, v] of [['compare', { a: 0, b: 6, y: 2, n: 1, m: 0 }], ['ccsp-cpc', { y: 2, n: 1, m: 0 }]] as const) {
       const out = getSpec(kind).run({ ...v });
-      expect(out.head[1], kind).toMatch(/^\$[\d,]+ · \$[\d,]+$/);
+      expect(out.head[0], kind).toContain(assumption());
+      expect(out.head[1], kind).toMatch(/^[A-Z-]+ \$[\d,]+\n[A-Z-]+ \$[\d,]+$/);
       expect(out.rows[2][0], kind).toMatch(/^Difference/);
-      expect(out.rows[3], kind).toEqual(['Counted the same way for both', '1 sitting each, no course, no books']);
     }
     const home = getSpec('compare').run({ a: 0, b: 6, y: 2, n: 1, m: 0 });
-    expect(home.head[1]).toBe('$883 · $617');
+    expect(home.head[1]).toBe('CPC $883\nCCS $617');
+    expect(home.rows[0][0]).toBe('CPC (AAPC) = $425 voucher + $229 AAPC dues, year 1 + $229 AAPC dues, 1 more year');
+    expect(home.rows[1][0]).toBe('CCS (AHIMA) = $399 exam fee + $218 recertification fee');
     expect(home.rows[2]).toEqual(['Difference: the CCS costs less by', '$266']);
+  });
+});
+
+// Naive testers, 2026-11-14, 2nd round: the CCS showed $617 on the home page, $693 on the CCS page and $475 on the
+// CCA page; each calculator chose its own years and sittings. One default now: DEFAULTS through standardCost.
+describe('one default assumption on every calculator', () => {
+  const run = (kind: string) => { const s = getSpec(kind); const v: Record<string, number> = {}; for (const i of s.inputs) v[i.id] = i.def; return s.run(v); };
+  it('every calculator that counts years or sittings defaults to the shared ones', () => {
+    for (const id of SPEC_IDS) for (const i of getSpec(id).inputs) {
+      if (/^Years of costs/.test(i.label)) expect(i.def, `${id}.${i.id}`).toBe(DEFAULTS.years);
+      if (/^Times you take the exam/.test(i.label)) expect(i.def, `${id}.${i.id}`).toBe(DEFAULTS.sittings);
+    }
+  });
+  it('the CPC and CCS default totals are the same on the home, CCS and CPC calculators', () => {
+    const cpc = standardCost('cpc').total, ccs = standardCost('ccs').total;
+    expect(run('compare').head[1]).toBe(`CPC $${cpc}\nCCS $${ccs}`);
+    expect(run('cpc-cost').head[1]).toBe(`$${cpc}`);
+    expect(run('ahima-member').rows[0][1]).toBe(`$${ccs}`);
+    expect(run('total').head[1]).toBe(`$${cpc}`);
+  });
+  it('the CCA page labels its CCS line as the exam fee only', () => {
+    const out = run('cca-path');
+    expect(out.rows[1]).toEqual(['CCS exam fee only, taken once', '$399']);
+    expect(out.note).toContain(`$${standardCost('ccs').total}`);
+    expect(JSON.stringify(out)).not.toMatch(/\$0\b/);
+  });
+});
+
+// Built pages (npm run check builds dist before vitest): the default CPC and CCS totals read on the home page, the CCS
+// page and the CPC page are the same figures.
+describe('built pages agree on the default totals', () => {
+  const read = (path: string) => readFileSync(join(__dirname, '..', 'dist', path), 'utf8').replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;| | /g, ' ');
+  const has = existsSync(join(__dirname, '..', 'dist', 'en', 'index.html'));
+  it.runIf(has)('home, CCS and CPC pages show the same CPC and CCS totals', () => {
+    const cpc = `$${standardCost('cpc').total}`, ccs = `$${standardCost('ccs').total}`;
+    const home = read('en/index.html'), ccsPage = read('en/ccs-certification/index.html'), cpcPage = read('en/cpc-certification/index.html');
+    expect(home).toContain(`CPC ${cpc}`);
+    expect(home).toContain(`CCS ${ccs}`);
+    expect(ccsPage).toContain(ccs);
+    expect(cpcPage).toContain(cpc);
+    // The old CCS figures: $693 (average retakes, CCS page) and $475 (CCA page). $475 is also AAPC's student 2-attempt voucher, so it is checked on the AHIMA pages only.
+    for (const p of [home, ccsPage]) expect(p).not.toContain('$693');
+    for (const p of [ccsPage, read('en/cca-certification/index.html')]) expect(p).not.toContain('$475');
   });
 });

@@ -11,7 +11,7 @@ export default definePage({
   en: {
     slug: 'how-to-become-a-medical-coder',
     nav: 'Becoming a medical coder',
-    card: 'The steps from first course to full credential, and the months of experience before the CPC loses its “A”.',
+    card: 'The steps from first course to full credential, and the months of experience before the CPC loses its “A” (apprentice) mark.',
     title: 'Becoming a Medical Coder: Steps, Exam Costs, CPC-A Status',
     description: 'Becoming a medical coder in 2026: training, the CPC or CCA exam, AAPC membership, and the two years of experience before the apprentice “A” comes off the CPC.',
     h1: 'Becoming a medical coder: the steps, and when the “A” comes off',

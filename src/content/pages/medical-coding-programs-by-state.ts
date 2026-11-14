@@ -12,7 +12,7 @@ export default definePage({
   en: {
     slug: 'medical-coding-programs-by-state',
     nav: 'Coding programs by state',
-    card: 'How many medical coding certificates and degrees schools awarded in each state, from the federal IPEDS file.',
+    card: 'How many medical coding certificates and degrees schools awarded in each state, from the federal schools database (IPEDS).',
     title: 'Medical Coding Programs by State: Awards in the IPEDS File',
     description: 'Medical coding programs by state: certificates and associate degrees awarded in 2023-24 under program code 51.0713, and how many schools reported them (IPEDS).',
     h1: 'Medical coding programs by state: what schools awarded',

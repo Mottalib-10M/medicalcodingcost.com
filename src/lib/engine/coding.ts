@@ -97,13 +97,49 @@ export function totalCost(i: TotalIn): TotalOut {
   else { joinDues = i.student ? A.membership.student : A.membership.individual; ren = (years - 1) * A.membership.renewal; }
   const total = exam + joinDues + ren + Math.max(0, i.prep) + Math.max(0, i.books);
   const lines: Array<[string, number]> = [
-    [ahima ? (sittings > 1.001 ? (Number.isInteger(sittings) ? `Exam fees, ${sittings} sittings` : 'Exam fees, retakes included on average') : 'Exam fee, 1 sitting') : (i.twoAttempt ? '2-attempt exam voucher' : 'Exam voucher' + (Math.ceil(sittings) > 1 ? 's' : ', 1 attempt')), exam],
+    [ahima ? (sittings > 1.001 ? (Number.isInteger(sittings) ? (sittings === 2 ? 'Exam fees, exam taken twice' : `Exam fees, exam taken ${sittings} times`) : 'Exam fees, retakes included on average') : 'Exam fee, exam taken once') : (i.twoAttempt ? '2-attempt exam voucher' : 'Exam voucher' + (Math.ceil(sittings) > 1 ? 's' : ', 1 attempt')), exam],
   ];
   if (!ahima) lines.push([i.student ? 'AAPC student membership, first year' : 'AAPC membership, first year', joinDues]);
   if (ren > 0) lines.push([ahima ? (i.member ? 'AHIMA dues and recertification' : 'AHIMA recertification fees') : `AAPC renewals, ${years - 1} more year${years - 1 === 1 ? '' : 's'}`, ren]);
   if (i.prep > 0) lines.push(['Course or review you buy', i.prep]);
   if (i.books > 0) lines.push(['Code books', i.books]);
   return { exam, joinDues, renewal: ren, prep: Math.max(0, i.prep), books: Math.max(0, i.books), total, sittings, lines };
+}
+
+/**
+ * The one default assumption of the whole site (naive testers, 2026-11-14, 2nd round: the CCS showed $617 on the home
+ * page, $693 on the CCS page and $475 on the CCA page because each calculator picked its own years and sittings).
+ * Every total of a credential shown by default, on any page, is `standardCost(id)`: 2 years, the exam taken once
+ * (AAPC: the 1-attempt voucher), no course, no books, AHIMA exam taken as a non-member.
+ */
+export const DEFAULTS = { years: 2, sittings: 1, ahimaMember: false } as const;
+/** The assumption in words, written next to every total: "2 years, exam taken once, no course". */
+export function assumption(years: number = DEFAULTS.years, sittings: number = DEFAULTS.sittings, course = false) {
+  const y = Math.max(1, Math.round(years));
+  return `${y} year${y === 1 ? '' : 's'}, exam taken ${sittings >= 2 ? 'twice (one retake)' : 'once'}, ${course ? 'course and books included' : 'no course'}`;
+}
+/**
+ * Total of one credential under the site's assumptions. 1 sitting = the exam taken once (AAPC: 1-attempt voucher);
+ * 2 sittings = one retake (AAPC: the 2-attempt voucher, AAPC's own price for a retake; AHIMA: a second fee).
+ * AAPC membership is required by AAPC, so always counted; AHIMA membership only when `ahimaMember`.
+ */
+export function standardCost(id: CredId, o: { years?: number; sittings?: number; ahimaMember?: boolean; student?: boolean } = {}) {
+  const sittings = Math.max(1, Math.min(2, Math.round(o.sittings ?? DEFAULTS.sittings)));
+  const years = o.years ?? DEFAULTS.years;
+  const ahimaMember = o.ahimaMember ?? DEFAULTS.ahimaMember;
+  return totalCost({ id, member: isAhima(id) ? ahimaMember : true, student: o.student, sittings, twoAttempt: !isAhima(id) && sittings === 2, prep: 0, books: 0, years });
+}
+/** A total split into its parts, in short words: "voucher $425 + AAPC dues $229 + 1 renewal $229". */
+export function parts(t: TotalOut): Array<[string, number]> {
+  return t.lines.map(([l, x]) => [
+    /voucher/i.test(l) ? (/2-attempt/.test(l) ? '2-attempt voucher' : 'voucher')
+      : /membership, first year/.test(l) ? 'AAPC dues, year 1'
+        : /AAPC renewals/.test(l) ? `AAPC dues, ${l.replace(/^AAPC renewals, /, '')}`
+          : /Exam fee/.test(l) ? (t.sittings > 1 ? 'two exam fees' : 'exam fee')
+            : /recertification/.test(l) ? (/dues/.test(l) ? 'AHIMA dues and recertification' : 'recertification fee')
+              : l.toLowerCase(),
+    x,
+  ]);
 }
 
 /**
@@ -114,16 +150,15 @@ export function totalCost(i: TotalIn): TotalOut {
  */
 export function compareTwo(a: CredId, b: CredId, o: { years: number; sittings: number; ahimaMember: boolean }) {
   const sittings = Math.max(1, Math.min(2, Math.round(o.sittings)));
-  const one = (id: CredId) => totalCost({ id, member: isAhima(id) ? o.ahimaMember : true, sittings, twoAttempt: !isAhima(id) && sittings === 2, prep: 0, books: 0, years: o.years });
-  const ta = one(a), tb = one(b);
+  const ta = standardCost(a, { ...o, sittings }), tb = standardCost(b, { ...o, sittings });
   const diff = Math.abs(ta.total - tb.total);
   const cheaper: CredId | null = ta.total === tb.total ? null : ta.total < tb.total ? a : b;
   return { a: ta, b: tb, diff, cheaper, sittings };
 }
 
-/** AHIMA member against non-member over `years`, for one exam taken `sittings` times (expected from the pass rate by default). */
-export function ahimaMembership(id: 'cca' | 'ccs' | 'ccsp', years: number, sittings?: number) {
-  const s = sittings ?? expectedAttempts(passRate(id)!.rate);
+/** AHIMA member against non-member over `years`, for one exam taken `sittings` times (once by default, as everywhere). */
+export function ahimaMembership(id: 'cca' | 'ccs' | 'ccsp', years: number, sittings: number = DEFAULTS.sittings) {
+  const s = sittings;
   const mem = totalCost({ id, member: true, sittings: s, prep: 0, books: 0, years });
   const non = totalCost({ id, member: false, sittings: s, prep: 0, books: 0, years });
   return { member: mem.total, nonMember: non.total, diff: non.total - mem.total, sittings: s };
