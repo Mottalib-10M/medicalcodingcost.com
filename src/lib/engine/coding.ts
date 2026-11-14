@@ -13,13 +13,13 @@ const H = P.ahima;
 const HX = H.exams;
 
 export const CREDS: Cred[] = [
-  { id: 'cpc', code: 'CPC', name: 'Certified Professional Coder', body: 'AAPC', setting: 'physician offices and outpatient services', minutes: A.cpc.minutes, items: A.cpc.questions, scored: A.cpc.questions },
+  { id: 'cpc', code: 'CPC', name: 'Certified Professional Coder', body: 'AAPC', setting: 'doctor offices and outpatient services, with no experience required', minutes: A.cpc.minutes, items: A.cpc.questions, scored: A.cpc.questions },
   { id: 'coc', code: 'COC', name: 'Certified Outpatient Coder', body: 'AAPC', setting: 'hospital outpatient departments and facilities', minutes: null, items: null, scored: null },
   { id: 'cic', code: 'CIC', name: 'Certified Inpatient Coder', body: 'AAPC', setting: 'hospital inpatient stays', minutes: 240, items: null, scored: null },
   { id: 'crc', code: 'CRC', name: 'Certified Risk Adjustment Coder', body: 'AAPC', setting: 'risk adjustment for health plans', minutes: null, items: null, scored: null },
   { id: 'cpb', code: 'CPB', name: 'Certified Professional Biller', body: 'AAPC', setting: 'billing and claims, not code assignment', minutes: 240, items: null, scored: null },
   { id: 'cca', code: 'CCA', name: 'Certified Coding Associate', body: 'AHIMA', setting: 'early-career coders', minutes: HX.cca.minutes, items: HX.cca.items, scored: HX.cca.scored },
-  { id: 'ccs', code: 'CCS', name: 'Certified Coding Specialist', body: 'AHIMA', setting: 'inpatient and outpatient records', minutes: HX.ccs.minutes, items: HX.ccs.items, scored: HX.ccs.scored },
+  { id: 'ccs', code: 'CCS', name: 'Certified Coding Specialist', body: 'AHIMA', setting: 'experienced coders of hospital records, for stays and visits (inpatient and outpatient)', minutes: HX.ccs.minutes, items: HX.ccs.items, scored: HX.ccs.scored },
   { id: 'ccsp', code: 'CCS-P', name: 'Certified Coding Specialist, Physician-based', body: 'AHIMA', setting: 'physician practices and clinics', minutes: HX.ccsp.minutes, items: HX.ccsp.items, scored: HX.ccsp.scored },
 ];
 export const credById = (id: CredId) => CREDS.find((c) => c.id === id)!;
@@ -100,7 +100,13 @@ export function totalCost(i: TotalIn): TotalOut {
     [ahima ? (sittings > 1.001 ? (Number.isInteger(sittings) ? (sittings === 2 ? 'Exam fees, exam taken twice' : `Exam fees, exam taken ${sittings} times`) : 'Exam fees, retakes included on average') : 'Exam fee, exam taken once') : (i.twoAttempt ? '2-attempt exam voucher' : 'Exam voucher' + (Math.ceil(sittings) > 1 ? 's' : ', 1 attempt')), exam],
   ];
   if (!ahima) lines.push([i.student ? 'AAPC student membership, first year' : 'AAPC membership, first year', joinDues]);
-  if (ren > 0) lines.push([ahima ? (i.member ? 'AHIMA dues and recertification' : 'AHIMA recertification fees') : `AAPC renewals, ${years - 1} more year${years - 1 === 1 ? '' : 's'}`, ren]);
+  // AHIMA dues and recertification on two lines (naive testers, 3rd round: "$398 AHIMA dues and recertification" could
+  // not be checked by hand).
+  if (ahima) {
+    const r = renewal(i.id, { member: i.member, years });
+    if (r.dues > 0) lines.push([`AHIMA dues, ${years} year${years === 1 ? '' : 's'}`, r.dues]);
+    if (r.recert > 0) lines.push([`AHIMA recertification fee${r.cycles > 1 ? `s, ${r.cycles} times` : ''}`, r.recert]);
+  } else if (ren > 0) lines.push([`AAPC renewals, ${years - 1} more year${years - 1 === 1 ? '' : 's'}`, ren]);
   if (i.prep > 0) lines.push(['Course or review you buy', i.prep]);
   if (i.books > 0) lines.push(['Code books', i.books]);
   return { exam, joinDues, renewal: ren, prep: Math.max(0, i.prep), books: Math.max(0, i.books), total, sittings, lines };
@@ -136,7 +142,8 @@ export function parts(t: TotalOut): Array<[string, number]> {
       : /membership, first year/.test(l) ? 'AAPC dues, year 1'
         : /AAPC renewals/.test(l) ? `AAPC dues, ${l.replace(/^AAPC renewals, /, '')}`
           : /Exam fee/.test(l) ? (t.sittings > 1 ? 'two exam fees' : 'exam fee')
-            : /recertification/.test(l) ? (/dues/.test(l) ? 'AHIMA dues and recertification' : 'recertification fee')
+            : /^AHIMA dues/.test(l) ? `${l} at $${H.membership.professional} a year`
+              : /recertification/.test(l) ? `renewal fee${/times/.test(l) ? 's' : ''}, due every ${H.recert.cycleYears} years to keep it`
               : l.toLowerCase(),
     x,
   ]);

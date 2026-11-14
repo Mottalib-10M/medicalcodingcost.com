@@ -1,6 +1,7 @@
 import { definePage } from '../../lib/guide-types';
 import P from '../../data/params-2026.json';
 import { money, pct } from '../../lib/format-l';
+import { standardCost } from '../../lib/engine/coding';
 
 const X = P.ahima.exams.cca;
 const last = X.rates[X.rates.length - 1];
@@ -18,8 +19,8 @@ export default definePage({
     title: 'CCA Certification: Fees, Format and the Step to the CCS',
     description: `CCA certification in 2026: ${money(X.member)} for AHIMA members or ${money(X.nonMember)}, ${X.items} questions in 2 hours, a first-time pass rate of ${pct(last[2])}, renewal, and what the later CCS step adds.`,
     h1: 'CCA certification: what the entry-level AHIMA exam costs',
-    intro: `CCA certification is AHIMA's entry-level coding credential: ${money(X.member)} per sitting for members, ${money(X.nonMember)} for others, and ${pct(last[2])} of first-time testers passed in ${last[0]}. Many go on to the CCS later: set the years between the two exams to price both steps.`,
-    resume: (h) => `The Certified Coding Associate (CCA) is the credential AHIMA offers to coders at the start of their career. The only eligibility rule is a high school diploma; AHIMA recommends, without requiring it, six months of coding experience, an AHIMA approved coding program (PCAP) or a training program that covers anatomy and physiology, medical terminology and basic diagnostic and procedural coding. The exam has ${h.num(X.items)} questions, ${h.num(X.scored)} of them scored, in ${h.hm(X.minutes)}, and a converted (scaled) score of ${h.H.passScore} passes. Each try costs ${h.usd(X.member)} for members or ${h.usd(X.nonMember)} for others. The first-time pass rate fell from ${h.pc(X.rates[0][2])} in ${X.rates[0][0]} to ${h.pc(last[2])} in ${last[0]}, so ${h.num(Math.round((1 - last[2]) * 100))} in 100 first-time testers had to take it again. Like the CCS, the CCA is renewed every ${h.H.recert.cycleYears} years with ${h.H.recert.ceus.cca} CEUs, and the CCS replaces it once passed. ${h.ahima('CCA certification page')}.`,
+    intro: `CCA certification is AHIMA's entry-level coding credential: ${money(X.member)} per sitting for members, ${money(X.nonMember)} for others, and ${pct(last[2])} of first-time testers passed in ${last[0]}. Over 2 years, with the fee to keep it, the CCA costs ${money(standardCost('cca').total)} as a non-member, counted like every total on this site; the calculator then prices the later step to the CCS.`,
+    resume: (h) => `The Certified Coding Associate (CCA) is the credential AHIMA offers to coders at the start of their career. The only eligibility rule is a high school diploma; AHIMA recommends, without requiring it, six months of coding experience, a coding program AHIMA has approved (its PCAP list) or a training program that covers anatomy and physiology, medical terminology and basic diagnostic and procedural coding. The exam has ${h.num(X.items)} questions, ${h.num(X.scored)} of them scored, in ${h.hm(X.minutes)}, and a converted (scaled) score of ${h.H.passScore} passes. Each try costs ${h.usd(X.member)} for members or ${h.usd(X.nonMember)} for others. The first-time pass rate fell from ${h.pc(X.rates[0][2])} in ${X.rates[0][0]} to ${h.pc(last[2])} in ${last[0]}, so ${h.num(Math.round((1 - last[2]) * 100))} in 100 first-time testers had to take it again. Like the CCS, the CCA is renewed every ${h.H.recert.cycleYears} years with ${h.H.recert.ceus.cca} CEUs, and the CCS replaces it once passed. ${h.ahima('CCA certification page')}.`,
     faqs: (h) => [
       { q: 'Can I take the CCA with no coding experience?', a: `Yes. AHIMA's only eligibility rule for the CCA is a high school diploma. Six months of experience or a coding program is recommended, not required. The exam still assumes you can code: the first-time pass rate was ${h.pc(last[2])} in ${last[0]}, which is lower than the CCS rate the same year.` },
       { q: 'Is it cheaper to skip the CCA and go straight to the CCS?', a: `On fees alone, yes: one CCS sitting costs ${h.usd(h.H.exams.ccs.nonMember)} for a non-member, while the two steps add a CCA fee and, if the gap lasts a full cycle, a CCA recertification. The CCS assumes more experience, though. The calculator above prices both steps with the gap you choose.` },
@@ -29,14 +30,14 @@ export default definePage({
       const rows = h.E.passRates('cca').map((r) => [String(r.year), h.num(r.testers), h.pc(r.rate), h.usd(h.H.exams.cca.nonMember * h.E.expectedAttempts(r.rate))]);
       return `
 <h2>CCA certification fees, retakes included</h2>
-<p>The fee is paid with each application, so a retake costs the same again: ${h.usd(h.H.exams.cca.nonMember)} if you pass the first time as a non-member, ${h.usd(2 * h.H.exams.cca.nonMember)} with one retake. “Average exam fees per person” spreads the retakes of that year over all candidates: an average, not your bill.</p>
-${h.table(['Year', 'First-time testers', 'Pass rate', 'Average exam fees per person (non-member)'], rows, `${h.num(X.certified)} CCA holders at the end of 2025, as AHIMA reports it.`, ['l', 'r', 'r', 'r'])}
+<p>The fee is paid with each application, so a retake costs the same again: ${h.usd(h.H.exams.cca.nonMember)} if you pass the first time as a non-member, ${h.usd(2 * h.H.exams.cca.nonMember)} with one retake. The table below is not your bill: “Average paid per candidate, retakes included” spreads the retakes of that year over all candidates.</p>
+${h.table(['Year', 'First-time testers', 'Pass rate', 'Average paid per candidate, retakes included (non-member)'], rows, `${h.num(X.certified)} CCA holders at the end of 2025, as AHIMA reports it.`, ['l', 'r', 'r', 'r'])}
 
 <h2>From the CCA to the CCS</h2>
 <p>AHIMA lists the CCA plus one year of coding experience among the profiles it recommends for the CCS. Once you pass the CCS, AHIMA's Recertification Guide says it replaces the CCA: the older credential and stops needing CEUs and a fee. Between the two exams, each full ${h.H.recert.cycleYears}-year cycle on the CCA costs one recertification fee, ${h.usd(h.H.recert.member)} for members or ${h.usd(h.H.recert.nonMember)} for others. The ${h.a('ccs-certification', 'CCS page')} prices the second step on its own.</p>
 
 <h2>Exam day</h2>
-<p>The CCA is taken at a Pearson VUE center within the ${h.H.scheduleWithinDays}-day eligibility window AHIMA sets after approval. Since May 1, 2026, candidates bring the code books on AHIMA's 2026 list; without them they cannot test and forfeit the fee. A retake needs a new application after ${h.H.retakeWaitDays} days. What moving the appointment costs is on the ${h.a('medical-coding-exam-rescheduling', 'rescheduling page')}.</p>
+<p>The CCA is taken at a Pearson VUE center (the company that runs the test centers) within the ${h.H.scheduleWithinDays}-day eligibility window AHIMA sets after approval. Since May 1, 2026, candidates bring the code books on AHIMA's 2026 list; without them they cannot test and forfeit the fee. A retake needs a new application after ${h.H.retakeWaitDays} days. What moving the appointment costs is on the ${h.a('medical-coding-exam-rescheduling', 'rescheduling page')}.</p>
 `;
     },
   },

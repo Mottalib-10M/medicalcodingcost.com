@@ -26,6 +26,8 @@ const a = (id: string, text: string) => `<a href="${href(id)}">${text}</a>`;
 const cmp1 = E.compareTwo('cpc', 'ccs', E.DEFAULTS);
 const cmp2 = E.compareTwo('cpc', 'ccs', { ...E.DEFAULTS, sittings: 2 });
 const cpc2 = cmp1.a, ccs2 = cmp1.b;
+// The home comparator opens on CPC against the CCA, the entry-level credential (naive testers, 3rd round).
+const cca2 = E.standardCost('cca');
 const title = 'Medical Coding Certification Cost: CPC, CCS, CCA Compared';
 const description = 'Medical coding certification cost in 2026: AAPC vouchers, AHIMA exam fees, dues, retakes and renewal for CPC, COC, CPB, CCA, CCS and CCS-P, side by side.';
 const faqs = [
@@ -45,14 +47,14 @@ const feeRows = [
   [`${aapcCreds.map((c) => c.code).join(', ')} (same price for each)`, 'AAPC', `${h.usd(A.voucher.core.one)} (1 attempt), ${h.usd(A.voucher.core.two)} (2 attempts)`, `${h.usd(A.membership.individual)} a year, required`],
   ...E.CREDS.filter((c) => c.body === 'AHIMA').map((c) => [`${c.code}, ${c.name}`, 'AHIMA', `${h.usd(E.examFee(c.id, { member: true }))} member, ${h.usd(E.examFee(c.id, { member: false }))} non-member`, `${h.usd(H.membership.professional)} a year, optional`]),
 ];
-const passRows = (['cca', 'ccs', 'ccsp'] as const).map((id) => [E.credById(id).code, ...E.passRates(id).map((r) => `${h.pc(r.rate)} (${h.num(r.testers)})`)]);
+const passRows = (['cca', 'ccs', 'ccsp'] as const).map((id) => [E.credById(id).code, ...E.passRates(id).map((r) => `${h.pc(r.rate)} of ${h.num(r.testers)}`)]);
 ---
 <PageLayout title={title} description={description} lang={lang} jsonLd={jsonLd} faqs={faqs} breadcrumbs={[]}>
   <header class="mb-3">
     <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-accent-600">AAPC and AHIMA fees, checked {h.read}</p>
     <h1 class="mt-0 text-[1.75rem] font-bold text-navy-900 max-sm:leading-tight sm:text-3xl md:text-4xl">Medical coding certification cost: CPC, CCS, CCA and more</h1>
-    <p class="mt-2 text-base text-navy-700 sm:text-lg">The medical coding certification cost is {h.usd(cpc2.total)} for the CPC (Certified Professional Coder) and {h.usd(ccs2.total)} for the CCS (Certified Coding Specialist) over 2 years, if you pass the exam the first time, before any course. Choose any two below to compare them.</p>
-    <p data-sigles class="mt-1 text-sm text-navy-700">Two private associations issue them. AAPC (founded as the American Academy of Professional Coders): its CPC is for physician offices. AHIMA (American Health Information Management Association): its CCS is for hospital records, its CCA for early-career coders. <a href={href('medical-billing-and-coding')} class="font-semibold text-accent-700 underline">New to coding? Which one to take first →</a></p>
+    <p class="mt-2 text-base text-navy-700 sm:text-lg">A medical coder turns a doctor's notes into standard codes for diagnoses, procedures and supplies, so the care can be billed. New to medical coding? Start with the CCA (Certified Coding Associate), the entry-level certification; its cost is below. <a data-debut href={href('medical-billing-and-coding')} class="inline-block whitespace-nowrap rounded-md border-2 border-accent-600 px-2 text-sm font-semibold text-accent-700 no-underline hover:bg-accent-50 sm:text-base">Which one to take first →</a></p>
+    <p data-sigles class="mt-1 text-sm text-navy-700">Over 2 years (the exam, then the fees to keep it), no course: CPC (Certified Professional Coder, from AAPC) {h.usd(cpc2.total)}, CCA {h.usd(cca2.total)}, CCS (Certified Coding Specialist) {h.usd(ccs2.total)}, both from AHIMA (American Health Information Management Association).</p>
     <p data-chrome data-independant class="mt-1 text-xs font-medium text-navy-600">{ui.independent}</p>
   </header>
   <div data-outil class="mb-4"><Tool tool={{ kind: 'mini:compare' }} primary={true} /></div>
@@ -73,7 +75,7 @@ const passRows = (['cca', 'ccs', 'ccsp'] as const).map((id) => [E.credById(id).c
     <article>
     <h2>Pass rates AHIMA publishes</h2>
     <p>AHIMA publishes the first-time pass rate of each exam for the last three years, with the number of first-time testers. AAPC publishes no rate on the pages we read, so the comparator counts the exam taken once for every credential, or twice if you choose it.</p>
-    <Fragment set:html={h.table(['Exam', '2023', '2024', '2025'], passRows, 'First-time pass rate (number of first-time testers), as AHIMA publishes it.', ['l', 'r', 'r', 'r'])} />
+    <Fragment set:html={h.table(['Exam', '2023', '2024', '2025'], passRows, 'Share of first-time testers who passed, of how many took it, as AHIMA publishes it.', ['l', 'r', 'r', 'r'])} />
     <p>Read them as an average across all first-time candidates, not as your chance. The <Fragment set:html={a('medical-coding-pass-rates', 'pass rate page')} /> turns them into average tries and exam fees.</p>
     </article>
     <article>

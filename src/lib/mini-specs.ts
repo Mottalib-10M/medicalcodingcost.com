@@ -16,7 +16,8 @@ const plural = (k: number, w: string) => `${n0(k)} ${w}${k === 1 ? '' : 's'}`;
 const A = P.aapc;
 const H = P.ahima;
 /** Short setting for the option labels: the chosen label must fit two lines on a 320 px phone (check-layout). */
-const SHORT: Record<string, string> = { cpc: 'physician offices', coc: 'hospital outpatient', cic: 'hospital inpatient', crc: 'risk adjustment', cpb: 'billing', cca: 'entry level', ccs: 'inpatient, outpatient', ccsp: 'physician practices' };
+// Plain words, not hospital jargon (naive testers, 3rd round: "inpatient, outpatient" was a guess).
+const SHORT: Record<string, string> = { cpc: 'doctor offices', coc: 'hospital visits', cic: 'hospital stays', crc: 'risk adjustment', cpb: 'billing', cca: 'entry level, to start', ccs: 'hospitals, experienced', ccsp: 'doctor offices, experienced' };
 const CRED_OPT = CREDS.map((c, i) => ({ value: String(i), label: `${c.code} (${c.body}), ${SHORT[c.id]}` }));
 const credOf = (v: number | undefined) => CREDS[clamp(Math.round(v ?? 0), 0, CREDS.length - 1)];
 const YES_NO = [{ value: '1', label: 'Yes' }, { value: '0', label: 'No' }];
@@ -37,6 +38,8 @@ const SITTINGS_ONE = [{ value: '1', label: 'Once (you pass the first time)' }, {
 const SITTINGS_LABEL = 'Times you take the exam';
 const sittingsOf = (v: number | undefined) => (Math.round(v ?? DEFAULTS.sittings) === 2 ? 2 : 1);
 const YEARS_LABEL = 'Years of costs to count (year 1 = exam year)';
+/** Why years at all (naive testers, 3rd round: "I wanted the price, not a price over 2 years"). */
+const YEARS_HELP = `A credential is not paid once: you keep paying to keep it. 2 years = the exam year and the next one, so the first renewal is counted`;
 /** A total and how it is made: "$425 voucher + $229 AAPC dues, year 1 + $229 AAPC dues, 1 more year". */
 const madeOf = (t: ReturnType<typeof standardCost>) => parts(t).map(([l, x]) => `${money(x)} ${l}`).join(' + ');
 /** Who a credential is for, in words, from the settings read on AAPC and AHIMA pages. */
@@ -54,6 +57,9 @@ function compareOut(ca: ReturnType<typeof credById>, cb: ReturnType<typeof credB
   return { r, head: [`Each one on its own: ${assumption(years, sittings)}`, `${ca.code} ${money(r.a.total)}\n${cb.code} ${money(r.b.total)}`] as [string, string], rows };
 }
 
+/** Said right under the big figure: what it leaves out, with the one cited figure for books (AAPC's member bundle). */
+const NO_COURSE = `These totals count no course and no code books, only the exam and the fees to keep the credential. AAPC's code book bundle alone is ${money(A.books.proFeeBundle.member, 2)} for members. Add yours with the link below.`;
+
 const SPECS: Record<string, () => MiniSpec> = {
   /** Home: two credentials side by side over the same years. */
   compare: () => ({
@@ -61,8 +67,9 @@ const SPECS: Record<string, () => MiniSpec> = {
     exemple: (v) => `Example for ${credOf(v.a).code} against ${credOf(v.b).code}: ${assumption(Math.round(v.y ?? DEFAULTS.years), sittingsOf(v.n))}, AHIMA exam taken as a non-member`,
     inputs: [
       { id: 'a', label: 'First credential', def: 0, options: CRED_OPT },
-      { id: 'b', label: 'Second credential', def: 6, options: CRED_OPT },
-      { id: 'y', label: YEARS_LABEL, def: DEFAULTS.years, unit: 'years', max: 10 },
+      // CPC against the CCA by default (naive testers, 3rd round: CPC against the CCS pushed a beginner to the CCS).
+      { id: 'b', label: 'Second credential', def: CREDS.findIndex((c) => c.id === 'cca'), options: CRED_OPT },
+      { id: 'y', label: YEARS_LABEL, help: YEARS_HELP, def: DEFAULTS.years, unit: 'years', max: 10 },
       { id: 'n', label: SITTINGS_LABEL, def: DEFAULTS.sittings, options: SITTINGS_OPT },
       { id: 'm', label: 'AHIMA member (changes AHIMA fees only)', def: 0, options: YES_NO, avance: true },
     ],
@@ -73,8 +80,8 @@ const SPECS: Record<string, () => MiniSpec> = {
       return {
         head: o.head,
         rows: o.rows,
-        alert: 'Starting from zero? Your course and code books are not counted here: add them with the link below.',
-        note: `Two separate choices, not two steps. ${whoFor(ca)}${ca.id === cb.id ? '' : ` ${whoFor(cb)}`} AAPC membership is counted because AAPC requires it; AHIMA membership ${v.m === 1 ? 'is counted, as you chose' : 'is optional and not counted'}. AHIMA's recertification fee is due every ${H.recert.cycleYears} years. Taking an AAPC exam twice is priced as the 2-attempt voucher.`,
+        alert: NO_COURSE,
+        note: `You pick one of the two; you do not need both. ${whoFor(ca)}${ca.id === cb.id ? '' : ` ${whoFor(cb)}`} AAPC membership is counted because AAPC requires it; AHIMA membership ${v.m === 1 ? 'is counted, as you chose' : 'is optional and not counted'}. AHIMA's renewal fee (recertification) is what you pay every ${H.recert.cycleYears} years to keep the credential. Taking an AAPC exam twice is priced as the 2-attempt voucher.`,
       };
     },
   }),
@@ -87,7 +94,7 @@ const SPECS: Record<string, () => MiniSpec> = {
       { id: 'n', label: SITTINGS_LABEL, def: DEFAULTS.sittings, options: SITTINGS_ONE },
       { id: 's', label: 'AAPC student pricing', def: 0, options: YES_NO, showIf: (v) => !isAhima(credOf(v.c).id), help: 'Student exam and dues rates, as AAPC lists them' },
       { id: 'm', label: 'Join AHIMA', def: 0, options: YES_NO, showIf: (v) => isAhima(credOf(v.c).id) },
-      { id: 'y', label: YEARS_LABEL, def: DEFAULTS.years, unit: 'years', max: 10 },
+      { id: 'y', label: YEARS_LABEL, help: YEARS_HELP, def: DEFAULTS.years, unit: 'years', max: 10 },
       { id: 'p', label: 'Course or review you pay', def: 0, unit: '$', max: 20000, avance: true },
       { id: 'k', label: 'Code books you buy', def: 0, unit: '$', max: 2000, avance: true },
     ],
@@ -111,7 +118,7 @@ const SPECS: Record<string, () => MiniSpec> = {
     exemple: (v) => `Example for ${['the CPC alone', 'the CPB alone', 'the CPC and the CPB'][clamp(Math.round(v.w ?? 2), 0, 2)]}: ${assumption(Math.round(v.y ?? DEFAULTS.years), 1)}`,
     inputs: [
       { id: 'w', label: 'Credential to earn', def: 2, options: [{ value: '0', label: 'CPC, coding' }, { value: '1', label: 'CPB, billing' }, { value: '2', label: 'Both CPC and CPB' }] },
-      { id: 'y', label: YEARS_LABEL, def: 2, unit: 'years', max: 10 },
+      { id: 'y', label: YEARS_LABEL, help: YEARS_HELP, def: 2, unit: 'years', max: 10 },
       { id: 's', label: 'AAPC student pricing', def: 0, options: YES_NO, avance: true },
     ],
     run: (v) => {
@@ -166,15 +173,15 @@ const SPECS: Record<string, () => MiniSpec> = {
     inputs: [
       { id: 'v', label: SITTINGS_LABEL, def: DEFAULTS.sittings, options: [{ value: '1', label: 'Once (1-attempt voucher)' }, { value: '2', label: 'Up to twice (2-attempt voucher)' }] },
       { id: 's', label: 'AAPC student pricing', def: 0, options: YES_NO },
-      { id: 'y', label: YEARS_LABEL, def: DEFAULTS.years, unit: 'years', max: 10 },
+      { id: 'y', label: YEARS_LABEL, help: YEARS_HELP, def: DEFAULTS.years, unit: 'years', max: 10 },
     ],
     run: (v) => {
       const years = clamp(Math.round(v.y ?? DEFAULTS.years), 1, 10);
       const t = standardCost('cpc', { years, sittings: sittingsOf(v.v), student: v.s === 1 });
       return {
         head: [`CPC, total: ${assumption(years, sittingsOf(v.v))}`, money(t.total)],
-        rows: [[sittingsOf(v.v) === 2 ? '2-attempt exam voucher' : '1-attempt exam voucher', money(t.exam)], ['AAPC membership, first year', money(t.joinDues)], [`Renewals at ${money(A.membership.renewal)} a year`, money(t.renewal)], ['Continuing education units (CEUs) to earn in that time', `${n0(renewal('cpc', { member: true, years }).ceus)}`]],
-        note: `The same total as on the home page comparator for the same years. AAPC: “maintain your AAPC annual membership, and earn ${A.ceu.perCycle} CEUs every ${A.ceu.cycleYears} years”. The cost of CEUs depends on how you earn them and is not counted.`,
+        rows: [[sittingsOf(v.v) === 2 ? '2-attempt exam voucher' : '1-attempt exam voucher', money(t.exam)], ['AAPC membership, first year', money(t.joinDues)], [`Renewals at ${money(A.membership.renewal)} a year`, money(t.renewal)], ['Continuing education units (CEUs) to earn in that time', `${n0(renewal('cpc', { member: true, years }).ceus)} CEUs (cost not counted)`]],
+        note: `The same total as on the home page comparator for the same years. AAPC: “maintain your AAPC annual membership, and earn ${A.ceu.perCycle} CEUs every ${A.ceu.cycleYears} years”. CEUs are hours of approved classes, webinars or events; what they cost depends on how you earn them, so it is not counted here: the CEUs and renewal page lists the ways to earn them.`,
       };
     },
   }),
@@ -206,7 +213,7 @@ const SPECS: Record<string, () => MiniSpec> = {
     title: 'One-attempt or two-attempt CPC voucher?', cta: 'Your CPC cost year by year',
     exemple: (v) => `Example for a ${n0(v.p ?? 70)}% chance of passing the first time, ${v.s === 1 ? 'student' : 'regular'} pricing`,
     inputs: [
-      { id: 'p', label: 'How sure are you to pass the first time?', def: 70, unit: '%', max: 100, help: 'Your own guess, from 0 to 100, for example from a practice test: AAPC publishes no pass rate' },
+      { id: 'p', label: 'Your chance of passing on the first try (a guess is fine)', def: 70, unit: '%', max: 100, help: 'From 0 to 100: use your latest practice test score if you have one. AAPC publishes no pass rate' },
       { id: 's', label: 'AAPC student pricing', def: 0, options: YES_NO },
     ],
     run: (v) => {
@@ -214,6 +221,8 @@ const SPECS: Record<string, () => MiniSpec> = {
       const pick = r.better === 'two' ? '2-attempt voucher' : '1-attempt voucher';
       return {
         head: ['Cheaper on average', pick],
+        // The plain advice first (naive testers, 3rd round: a chance in % and an "average" price were hard to use).
+        alert: `Not sure you will pass the first time? The 2-attempt voucher (${money(r.two)}) costs ${money(r.two - r.one)} more than one try (${money(r.one)}) and covers a retake.`,
         rows: [['2-attempt voucher, paid once', money(r.two)], ['1-attempt voucher, plus a second only if you fail', `${money(r.expectedSingles)} on average`], ['The 2-attempt voucher is cheaper if your chance is below', pct(r.breakEven, 1)]],
         note: `The totals on the other pages of this site count the 1-attempt voucher (${money(r.one)}), the price if you pass the first time; choose “Twice” there and they count the 2-attempt voucher (${money(r.two)}), as here. Vouchers are non-refundable and valid ${A.voucherValidMonths} months from purchase.`,
       };
@@ -243,7 +252,7 @@ const SPECS: Record<string, () => MiniSpec> = {
     exemple: (v) => `Example for the ${credById(AHIMA_IDS[clamp(Math.round(v.e ?? 1), 0, 2)]).code}: ${assumption(Math.round(v.y ?? DEFAULTS.years), sittingsOf(v.n))}`,
     inputs: [
       { id: 'e', label: 'AHIMA exam', def: 1, options: AHIMA_OPT },
-      { id: 'y', label: YEARS_LABEL, def: DEFAULTS.years, unit: 'years', max: 10 },
+      { id: 'y', label: YEARS_LABEL, help: YEARS_HELP, def: DEFAULTS.years, unit: 'years', max: 10 },
       { id: 'n', label: SITTINGS_LABEL, def: DEFAULTS.sittings, options: SITTINGS_ONE },
     ],
     run: (v) => {
@@ -254,15 +263,17 @@ const SPECS: Record<string, () => MiniSpec> = {
       const non = standardCost(id, { years, sittings: n, ahimaMember: false });
       const mem = standardCost(id, { years, sittings: n, ahimaMember: true });
       return {
-        head: [`${r.diff > 0 ? 'Joining saves you' : 'Staying a non-member saves you'} (${assumption(years, n)})`, money(Math.abs(r.diff))],
+        head: [`${r.diff > 0 ? 'Joining AHIMA saves you' : r.diff < 0 ? 'Joining AHIMA costs you more by' : 'Joining AHIMA changes nothing'} (${assumption(years, n)})`, money(Math.abs(r.diff))],
         rows: [[`As a non-member: ${madeOf(non)}`, money(r.nonMember)], [`As a member: ${madeOf(mem)}`, money(r.member)]],
-        note: `Professional dues ${money(H.membership.professional)} a year; recertification every ${H.recert.cycleYears} years: ${money(H.recert.member)} member, ${money(H.recert.nonMember)} non-member. Student dues are ${money(H.membership.student)}.`,
+        note: `Professional dues ${money(H.membership.professional)} a year. The renewal fee (recertification) is what you pay AHIMA every ${H.recert.cycleYears} years to keep the credential: ${money(H.recert.member)} for members, ${money(H.recert.nonMember)} for others. Student dues are ${money(H.membership.student)}.`,
       };
     },
   }),
   /** CCA page: CCA first then CCS, or straight to the CCS. */
   'cca-path': () => ({
-    title: 'CCA first, then CCS: what the two steps cost', cta: 'Join AHIMA or not',
+    // The CCA on its own first, on the site's one base, then the step to the CCS (naive testers, 3rd round: the big
+    // figure was both exam fees, $698, on a page read for the CCA alone).
+    title: 'The CCA on its own, then the step to the CCS', cta: 'Join AHIMA or not',
     exemple: (v) => `Example for a ${v.m === 1 ? 'member' : 'non-member'} who takes the CCS ${yrs(Math.round(v.g ?? 1))} after the CCA, each exam taken ${sittingsOf(v.n) === 2 ? 'twice' : 'once'}`,
     inputs: [
       { id: 'g', label: 'Years between the CCA and the CCS', def: 1, unit: 'years', max: 6 },
@@ -281,13 +292,15 @@ const SPECS: Record<string, () => MiniSpec> = {
       const dues = member ? (gap + 1) * H.membership.professional : 0;
       const total = cca + ccs + cyclesOnCca * recert + dues;
       const ccsAlone = standardCost('ccs', { sittings: n, ahimaMember: member });
-      const rows: Array<[string, string]> = [[`CCA exam fee only, taken ${times}`, money(cca)], [`CCS exam fee only, taken ${times}`, money(ccs)]];
-      if (cyclesOnCca > 0) rows.push(['CCA recertification paid in between', money(cyclesOnCca * recert)]);
-      if (dues > 0) rows.push(['AHIMA dues over the period', money(dues)]);
+      const ccaAlone = standardCost('cca', { sittings: n, ahimaMember: member });
+      const rows: Array<[string, string]> = [[`CCA = ${madeOf(ccaAlone)}`, money(ccaAlone.total)], [`Later step: CCS exam fee only, taken ${times}`, money(ccs)]];
+      if (cyclesOnCca > 0) rows.push(['CCA renewal fees paid before the CCS', money(cyclesOnCca * recert)]);
+      if (dues > 0) rows.push(['AHIMA dues until the CCS', money(dues)]);
+      rows.push([`Both exams, until you hold the CCS (CCA exam fee ${money(cca)} + CCS exam fee${cyclesOnCca > 0 || dues > 0 ? ' + the lines above' : ''})`, money(total)]);
       return {
-        head: [`Both steps, until you hold the CCS (exam taken ${times} each, no course)`, money(total)],
+        head: [`CCA on its own: ${assumption(DEFAULTS.years, n)}`, money(ccaAlone.total)],
         rows,
-        note: `This counts the two exam fees${cyclesOnCca > 0 || dues > 0 ? ' and what you pay AHIMA in between' : ''}, not the CCS renewal after you earn it. The CCS on its own, ${assumption(DEFAULTS.years, n)}, costs ${money(ccsAlone.total)} (${madeOf(ccsAlone)}), the figure the home page comparator shows. Once the CCS is earned it replaces the CCA, so only the CCS is renewed.`,
+        note: `The CCA total is counted like every total on this site, the same base as the home page. The step to the CCS counts the exam fees${cyclesOnCca > 0 || dues > 0 ? ' and what you pay AHIMA in between' : ''}, not the CCS renewal after you earn it; the CCS on its own costs ${money(ccsAlone.total)} (${madeOf(ccsAlone)}). Once the CCS is earned it replaces the CCA, so only the CCS is renewed.`,
       };
     },
   }),
@@ -296,7 +309,7 @@ const SPECS: Record<string, () => MiniSpec> = {
     title: 'CCS-P or CPC for physician-practice coding', cta: 'Compare any two credentials',
     exemple: (v) => `Example: ${assumption(Math.round(v.y ?? DEFAULTS.years), sittingsOf(v.n))}, ${v.m === 1 ? 'AHIMA member' : 'not an AHIMA member'}`,
     inputs: [
-      { id: 'y', label: YEARS_LABEL, def: DEFAULTS.years, unit: 'years', max: 10 },
+      { id: 'y', label: YEARS_LABEL, help: YEARS_HELP, def: DEFAULTS.years, unit: 'years', max: 10 },
       { id: 'n', label: SITTINGS_LABEL, def: DEFAULTS.sittings, options: SITTINGS_OPT },
       { id: 'm', label: 'AHIMA member for the CCS-P', def: 0, options: YES_NO },
     ],
@@ -304,9 +317,13 @@ const SPECS: Record<string, () => MiniSpec> = {
       const years = clamp(Math.round(v.y ?? DEFAULTS.years), 1, 10);
       const o = compareOut(credById('ccsp'), credById('cpc'), years, sittingsOf(v.n), v.m === 1);
       const pr = passRate('ccsp')!;
+      // The verdict that flips with one retake is said in the result (naive testers, 3rd round: it sat in a paragraph).
+      const retake = sittingsOf(v.n) === 1 ? compareTwo('ccsp', 'cpc', { years, sittings: 2, ahimaMember: v.m === 1 }) : null;
+      const flips = retake && retake.cheaper && retake.cheaper !== o.r.cheaper;
       return {
         head: o.head,
         rows: o.rows,
+        alert: flips ? `With one retake each: CCS-P ${money(retake!.a.total)}, CPC ${money(retake!.b.total)}, so the ${credById(retake!.cheaper!).code} becomes cheaper. ${n0(Math.round((1 - pr.rate) * 100))} in 100 first-time CCS-P testers failed in ${pr.year}.` : undefined,
         note: `Only ${pct(pr.rate)} of first-time CCS-P testers passed in ${pr.year}; AAPC publishes no CPC rate. Choose “Twice each” to budget a retake on both sides: taking an AAPC exam twice is priced as the 2-attempt voucher.`,
       };
     },

@@ -135,7 +135,7 @@ describe('comparisons count both credentials the same way', () => {
     const home = getSpec('compare').run({ a: 0, b: 6, y: 2, n: 1, m: 0 });
     expect(home.head[1]).toBe('CPC $883\nCCS $617');
     expect(home.rows[0][0]).toBe('CPC (AAPC) = $425 voucher + $229 AAPC dues, year 1 + $229 AAPC dues, 1 more year');
-    expect(home.rows[1][0]).toBe('CCS (AHIMA) = $399 exam fee + $218 recertification fee');
+    expect(home.rows[1][0]).toBe('CCS (AHIMA) = $399 exam fee + $218 renewal fee, due every 2 years to keep it');
     expect(home.rows[2]).toEqual(['Difference: the CCS costs less by', '$266']);
   });
 });
@@ -151,15 +151,19 @@ describe('one default assumption on every calculator', () => {
     }
   });
   it('the CPC and CCS default totals are the same on the home, CCS and CPC calculators', () => {
-    const cpc = standardCost('cpc').total, ccs = standardCost('ccs').total;
-    expect(run('compare').head[1]).toBe(`CPC $${cpc}\nCCS $${ccs}`);
+    const cpc = standardCost('cpc').total, ccs = standardCost('ccs').total, cca = standardCost('cca').total;
+    // Naive testers, 3rd round: the home comparator opens on CPC against the CCA, the entry-level credential.
+    expect(run('compare').head[1]).toBe(`CPC $${cpc}\nCCA $${cca}`);
+    expect(run('cca-path').head[1]).toBe(`$${cca}`);
     expect(run('cpc-cost').head[1]).toBe(`$${cpc}`);
     expect(run('ahima-member').rows[0][1]).toBe(`$${ccs}`);
     expect(run('total').head[1]).toBe(`$${cpc}`);
   });
-  it('the CCA page labels its CCS line as the exam fee only', () => {
+  it('the CCA page shows the CCA on its own first, then labels its CCS line as the exam fee only', () => {
     const out = run('cca-path');
-    expect(out.rows[1]).toEqual(['CCS exam fee only, taken once', '$399']);
+    expect(out.head[0]).toContain(assumption());
+    expect(out.rows[0]).toEqual(['CCA = $299 exam fee + $218 renewal fee, due every 2 years to keep it', '$517']);
+    expect(out.rows[1]).toEqual(['Later step: CCS exam fee only, taken once', '$399']);
     expect(out.note).toContain(`$${standardCost('ccs').total}`);
     expect(JSON.stringify(out)).not.toMatch(/\$0\b/);
   });
@@ -174,11 +178,32 @@ describe('built pages agree on the default totals', () => {
     const cpc = `$${standardCost('cpc').total}`, ccs = `$${standardCost('ccs').total}`;
     const home = read('en/index.html'), ccsPage = read('en/ccs-certification/index.html'), cpcPage = read('en/cpc-certification/index.html');
     expect(home).toContain(`CPC ${cpc}`);
-    expect(home).toContain(`CCS ${ccs}`);
+    expect(home).toContain(`Specialist) ${ccs}`);
+    expect(home).toContain(`CCA $${standardCost('cca').total}`);
     expect(ccsPage).toContain(ccs);
     expect(cpcPage).toContain(cpc);
     // The old CCS figures: $693 (average retakes, CCS page) and $475 (CCA page). $475 is also AAPC's student 2-attempt voucher, so it is checked on the AHIMA pages only.
     for (const p of [home, ccsPage]) expect(p).not.toContain('$693');
     for (const p of [ccsPage, read('en/cca-certification/index.html')]) expect(p).not.toContain('$475');
+  });
+});
+
+// Naive testers, 2026-11-14, 3rd round: "$398 AHIMA dues and recertification" could not be checked by hand, and the
+// CCS-P/CPC verdict that flips with one retake sat in a paragraph.
+describe('third round: totals that can be checked by hand', () => {
+  it('AHIMA dues and the renewal fee are two separate lines', () => {
+    const mem = standardCost('ccs', { ahimaMember: true });
+    expect(mem.lines.map(([l]) => l)).toEqual(['Exam fee, exam taken once', 'AHIMA dues, 2 years', 'AHIMA recertification fee']);
+    expect(mem.lines.reduce((s, [, x]) => s + x, 0)).toBe(mem.total);
+    const out = getSpec('ahima-member').run({ e: 1, y: 2, n: 1 });
+    expect(out.rows[1][0]).toBe('As a member: $299 exam fee + $298 AHIMA dues, 2 years at $149 a year + $100 renewal fee, due every 2 years to keep it');
+    expect(out.head[0]).toMatch(/^Joining AHIMA costs you more by/);
+  });
+  it('the CCS-P calculator says in its result when one retake each flips the cheaper one', () => {
+    const out = getSpec('ccsp-cpc').run({ y: 2, n: 1, m: 0 });
+    expect(out.alert).toContain('$1,016');
+    expect(out.alert).toContain('$957');
+    expect(out.alert).toContain('the CPC becomes cheaper');
+    expect(getSpec('ccsp-cpc').run({ y: 2, n: 2, m: 0 }).alert).toBeUndefined();
   });
 });
