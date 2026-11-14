@@ -54,27 +54,31 @@ const passRows = (['cca', 'ccs', 'ccsp'] as const).map((id) => [E.credById(id).c
   <p class="mb-8 text-sm text-navy-600">Fees checked on <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, 'en-US')}</time> · {AUTHOR_NAME} · <a href={route('method', lang)} class="underline hover:text-navy-900">How the costs are added up</a> · <a href={route('about', lang)} class="underline hover:text-navy-900">About this site</a></p>
 
   <div class="prose prose-slate max-w-none">
+    <article>
     <h2>Medical coding certification cost, credential by credential</h2>
     <p>The table gives what each body charges for one exam and what it charges to stay a member. AAPC uses one price for all its core exams, so the CPC, the COC, the CIC, the CRC and the CPB cost the same to sit. AHIMA prices each exam and gives members {h.usd(H.exams.ccs.nonMember - H.exams.ccs.member)} off.</p>
     <Fragment set:html={h.table(['Credential', 'Body', 'Exam', 'Membership'], feeRows, `AAPC voucher prices and dues read on aapc.com; AHIMA fees read on its certification pages, ${h.read}.`, ['l', 'l', 'l', 'l'])} />
     <p>AAPC also lists student pricing: vouchers at {h.usd(A.voucher.student.one)} or {h.usd(A.voucher.student.two)} and student dues of {h.usd(A.membership.student)} for a new member enrolled in an AAPC course. The <Fragment set:html={a('cpc-exam-cost', 'CPC exam cost page')} /> says when the 2-attempt voucher pays for itself.</p>
-
+    </article>
+    <article>
     <h2>What the exams look like</h2>
     <p>The CPC has {A.cpc.questions} multiple-choice questions in {h.hm(A.cpc.minutes)}, and you pass with {A.cpc.passCorrect} right answers. AHIMA exams mix scored and unscored pretest questions and report a scaled score, with {H.passScore} to pass: the CCA has {H.exams.cca.items} questions in {h.hm(H.exams.cca.minutes)}, the CCS {H.exams.ccs.items} in {h.hm(H.exams.ccs.minutes)}, the CCS-P {H.exams.ccsp.items} in {h.hm(H.exams.ccsp.minutes)}. Code books are allowed in all of them, which is why their edition year matters: see <Fragment set:html={a('medical-coding-code-books', 'code books')} />.</p>
-
+    </article>
+    <article>
     <h2>Pass rates AHIMA publishes</h2>
     <p>AHIMA publishes the first-time pass rate of each exam for the last three years, with the number of first-time testers. AAPC publishes no rate on the pages we read, which is why the CPC is counted with the sittings you choose.</p>
     <Fragment set:html={h.table(['Exam', '2023', '2024', '2025'], passRows, 'First-time pass rate (number of first-time testers), as AHIMA publishes it.', ['l', 'r', 'r', 'r'])} />
     <p>Read them as an average across all first-time candidates, not as your chance. The <Fragment set:html={a('medical-coding-pass-rates', 'pass rate page')} /> turns them into expected sittings and fees.</p>
-
+    </article>
+    <article>
     <h2>Keeping the credential</h2>
     <p>A credential is not paid once. AAPC asks for yearly dues of {h.usd(A.membership.renewal)} and {A.ceu.perCycle} continuing education units (CEUs) every {A.ceu.cycleYears} years. AHIMA asks for {H.recert.ceus.ccs} CEUs every {H.recert.cycleYears} years for its coding credentials and a recertification fee of {h.usd(H.recert.member)} for members or {h.usd(H.recert.nonMember)} for non-members. Over five years, these lines can weigh more than the exam: the <Fragment set:html={a('medical-coding-ceu-requirements', 'renewal calculator')} /> adds them.</p>
-
+    </article>
     <h2>Every page of the site</h2>
   </div>
   <div class="not-prose mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" data-sommaire>
     {GROUPS_ORDER.map((g) => (
-      <section><h3 class="mb-2 text-lg font-semibold text-navy-900">{groupLabel(g)}</h3><ul class="space-y-2 text-sm">{cards(g).map((c) => <li><a href={c.href} class="font-medium text-accent-700 underline">{c.name}</a><span class="block text-navy-700">{c.text}</span></li>)}</ul></section>
+      <nav aria-label={groupLabel(g)}><h3 class="mb-2 text-lg font-semibold text-navy-900">{groupLabel(g)}</h3><ol class="space-y-2 text-sm">{cards(g).map((c) => <li><a href={c.href} class="font-medium text-accent-700 underline">{c.name}</a><span class="block text-navy-700">{c.text}</span></li>)}</ol></nav>
     ))}
   </div>
   <div class="prose prose-slate mt-8 max-w-none">
