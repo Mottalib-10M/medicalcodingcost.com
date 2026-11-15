@@ -17,7 +17,7 @@ const A = P.aapc;
 const H = P.ahima;
 /** Short setting for the option labels: the chosen label must fit two lines on a 320 px phone (check-layout). */
 // Plain words, not hospital jargon (naive testers, 3rd round: "inpatient, outpatient" was a guess).
-const SHORT: Record<string, string> = { cpc: 'doctor offices', coc: 'hospital visits', cic: 'hospital stays', crc: 'risk adjustment', cpb: 'billing', cca: 'entry level, to start', ccs: 'hospitals, experienced', ccsp: 'doctor offices, experienced' };
+const SHORT: Record<string, string> = { cpc: 'doctor offices', coc: 'hospital visits', cic: 'hospital stays', crc: 'risk adjustment', cpb: 'billing', cca: 'entry level, hospitals', ccs: 'hospitals, experienced', ccsp: 'doctor offices, experienced' };
 const CRED_OPT = CREDS.map((c, i) => ({ value: String(i), label: `${c.code} (${c.body}), ${SHORT[c.id]}` }));
 const credOf = (v: number | undefined) => CREDS[clamp(Math.round(v ?? 0), 0, CREDS.length - 1)];
 const YES_NO = [{ value: '1', label: 'Yes' }, { value: '0', label: 'No' }];
@@ -161,7 +161,7 @@ const SPECS: Record<string, () => MiniSpec> = {
       return {
         head: ['Credential to look at first', b ? `${credById(a).code} or ${credById(b).code}` : credById(a).code],
         rows,
-        note: j === 5 ? `AAPC adds “-A” (apprentice) to a CPC earned without ${A.apprentice.years} years of experience; AHIMA's CCA asks only a high school diploma.` : 'Both bodies are recognized nationally; job ads often name the one the employer prefers.',
+        note: j === 5 ? `Start with the CPC for doctor offices, or the CCA for hospitals, as it leads to the CCS. AAPC adds “-A” (apprentice) to a CPC earned without ${A.apprentice.years} years of experience; AHIMA's CCA asks only a high school diploma.` : 'Both bodies are recognized nationally; job ads often name the one the employer prefers.',
         go: [`${credById(a).code} cost in full →`, j === 3 ? '/en/medical-billing-and-coding-certification/' : j === 5 ? '/en/cca-certification/' : '/en/medical-coding-certification/'],
       };
     },

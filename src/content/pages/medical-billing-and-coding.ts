@@ -16,7 +16,7 @@ export default definePage({
     title: 'Medical Billing and Coding: Which Credential for Which Job',
     description: 'Medical billing and coding work in six settings, from physician offices to hospitals and health plans: the AAPC or AHIMA credential each asks for, and its fee.',
     h1: 'Medical billing and coding: which credential for which job',
-    intro: `Medical billing and coding covers six kinds of work, each with its own credential. Exam fees run from ${money(P.ahima.exams.cca.member)} to ${money(P.aapc.voucher.core.one)} for one attempt. Pick the work you want below to see what to earn first.`,
+    intro: `Medical billing and coding covers six kinds of work, each with its own credential. Exam fees run from ${money(P.ahima.exams.cca.member)} to ${money(P.aapc.voucher.core.one)} for one attempt. New to coding? Start with the CPC for doctor offices, or the CCA for hospitals, as it leads to the CCS. Pick the work you want below.`,
     resume: (h) => `Coding and billing are two halves of the same money trail. A coder reads what the provider documented and assigns standard codes for diagnoses, procedures and supplies; a biller puts those codes on a claim, sends it to the payer and follows it until it is paid or denied. The credential that fits depends less on that split than on where you work: a physician office uses professional codes, a hospital uses facility codes, and a health plan reviews risk adjustment codes. AAPC has a credential for each setting (CPC, COC, CIC, CRC) and one for billing (CPB); AHIMA has the CCA to start and the CCS and CCS-P for experienced coders. The tool below matches each kind of work to the credentials AAPC and AHIMA aim at it, with the fee read on ${h.read}. The rest of the site then adds dues, retakes and renewal.`,
     faqs: (h) => [
       { q: 'Is medical billing or medical coding the better place to start?', a: `That depends on the job you can get locally, not on the credential. Coding has more credentials and more settings; billing has one AAPC credential, the CPB. Both exams cost ${h.usd(h.A.voucher.core.one)} for a one-attempt voucher and both need AAPC membership. Read local job ads first: they say which credential employers ask for.` },
@@ -30,7 +30,7 @@ export default definePage({
         ['Hospital inpatient stays', 'CIC (AAPC)', 'CCS (AHIMA)'],
         ['Billing, claims and denials', 'CPB (AAPC)', 'none'],
         ['Risk adjustment for health plans', 'CRC (AAPC)', 'none'],
-        ['First job, no experience yet', 'CPC, with “A” for apprentice', 'CCA (AHIMA)'],
+        ['First job, no experience yet', 'CPC for doctor offices, with “A” for apprentice', 'CCA for hospitals, leads to the CCS'],
       ];
       return `
 <h2>Medical billing and coding settings and their credentials</h2>
