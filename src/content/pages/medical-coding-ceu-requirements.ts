@@ -31,7 +31,7 @@ export default definePage({
         const c = h.E.renewal('cpc', { member: true, years: y });
         const n = h.E.renewal('ccs', { member: false, years: y });
         const m = h.E.renewal('ccs', { member: true, years: y });
-        return [`${y} years`, h.usd(c.total), h.usd(n.total), h.usd(m.total)];
+        return [`${y} ${y === 1 ? 'year' : 'years'}`, h.usd(c.total), h.usd(n.total), h.usd(m.total)];
       });
       return `
 <h2>Medical coding CEU requirements side by side</h2>
