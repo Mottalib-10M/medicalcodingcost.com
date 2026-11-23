@@ -37,6 +37,7 @@ const faqs = [
   { q: 'Which bodies issue medical coding credentials?', a: 'Two national associations issue the coding credentials most job ads name: AAPC (CPC, COC, CIC, CRC, CPB and specialty credentials) and AHIMA (CCA, CCS, CCS-P). Neither is a government body. NHA also offers a billing and coding credential, the CBCS, which this site does not cost because its pages could not be read.' },
   { q: 'How much is AHIMA membership, and is it required?', a: `It is optional. AHIMA lists Professional membership at ${h.usd(H.membership.professional)} a year, Professional Premier at ${h.usd(H.membership.premier)} and Student at ${h.usd(H.membership.student)}. Members pay ${h.usd(H.exams.ccs.nonMember - H.exams.ccs.member)} less per CCS sitting and ${h.usd(H.recert.member)} instead of ${h.usd(H.recert.nonMember)} to recertify, so membership pays only when those savings beat the dues.` },
   { q: 'How long is an AAPC exam voucher valid?', a: `AAPC exam vouchers are valid for ${A.voucherValidMonths} months from purchase and are not refundable. Buy one when you can name a month for the exam: a voucher bought too early and left unused is lost money, and AAPC holds no exams from late December until ${A.blackout.resumes}.` },
+  { q: 'What will the 2027 figures be?', a: `What is already set for 2027: AAPC exams stop from December ${A.blackout.startDay}, 2026 and resume on January 11, 2027 (the second Monday of January) with the 2027 code sets, and the CPC accepts 2026 or 2027 code books. AAPC and AHIMA have not published 2027 exam fees, dues or codebook lists, and neither keeps a price calendar: the comparator switches to their 2027 figures as soon as they publish them. AHIMA made the new year's books compulsory on May 1 in 2021 and in 2026.` },
   { q: 'How long do I have to take an AHIMA exam once approved?', a: `AHIMA gives an eligibility window of ${H.scheduleWithinDays} days after it approves the application, and the Pearson VUE appointment must fall inside it. Moving the appointment is free up to ${H.pearson.freeBusinessDays} business days before the date and costs ${h.usd(H.pearson.fee)} after that, down to ${H.pearson.feeToHours} hours before.` },
 ];
 const jsonLd = [websiteSchema(lang), organizationSchema(lang), webApplicationSchema({ name: 'Medical coding credential cost comparator', description, path: route('home', lang), lang }), faqSchema(faqs, lang)];
@@ -81,6 +82,20 @@ const passRows = (['cca', 'ccs', 'ccsp'] as const).map((id) => [E.credById(id).c
     <article>
     <h2>Keeping the credential</h2>
     <p>A credential is not paid once. AAPC asks for yearly dues of {h.usd(A.membership.renewal)} and {A.ceu.perCycle} continuing education units (CEUs) every {A.ceu.cycleYears} years. AHIMA asks for {H.recert.ceus.ccs} CEUs every {H.recert.cycleYears} years for its coding credentials and a recertification fee of {h.usd(H.recert.member)} for members or {h.usd(H.recert.nonMember)} for non-members. Over five years, these lines can weigh more than the exam: the <Fragment set:html={a('medical-coding-ceu-requirements', 'renewal calculator')} /> adds them.</p>
+    </article>
+    <article>
+    <h2>Medical coding certification cost in 2027</h2>
+    <p>Already official for 2027, on the AAPC pages read {h.read}:</p>
+    <ul>
+    <li>AAPC holds no exams from December {A.blackout.startDay}, 2026 and resumes on January 11, 2027, the second Monday of January, with the exams updated to the 2027 code sets. A second attempt of a 2-attempt voucher taken in 2027 uses the 2027 exam.</li>
+    <li>For the CPC, AAPC accepts code books of the preceding or the current year: in 2027, the 2026 or the 2027 books, one copy of each.</li>
+    </ul>
+    <p>Not yet published:</p>
+    <ul>
+    <li>AAPC voucher prices and dues for 2027: AAPC keeps no price calendar, so the new figures will be shown as soon as AAPC publishes them on its voucher and membership pages.</li>
+    <li>AHIMA exam fees and the 2027 codebook lists: expected from AHIMA, which posts a list for each exam. In 2021 and 2026 the new year's books became compulsory for exams delivered on or after May 1; the 2027 date will be shown as soon as AHIMA announces it.</li>
+    </ul>
+    <p>The comparator above moves to the 2027 fees as soon as AAPC or AHIMA publishes them. Until then it uses the fees read {h.read}. Which books to bring: <Fragment set:html={a('medical-coding-code-books', 'code books')} />.</p>
     </article>
     <h2>Every page of the site</h2>
   </div>
